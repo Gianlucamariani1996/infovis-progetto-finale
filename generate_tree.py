@@ -22,8 +22,8 @@ else:
 uncle_to_append = {}
 
 def generate_tree(num_block):
-    tree_before = generate_tree_aux(num_block -5, 5, num_block)
-    tree_after = generate_tree_aux(num_block +1, 3, num_block)
+    tree_before = generate_tree_aux(num_block - 5, 5, num_block - 5)
+    tree_after = generate_tree_aux(num_block + 1, 3, num_block - 5)
 
     junction_of_trees(tree_before, tree_after, num_block)
 
@@ -37,7 +37,7 @@ def generate_tree(num_block):
     # json_file.write(string_of_final_tree)
     # json_file.close()
 
-def generate_tree_aux(root, height, length):
+def generate_tree_aux(root, height, height_root):
 
     root_hash = web3.eth.getBlock(root)["hash"].hex()[:7]
     number_uncles = web3.eth.get_uncle_count(root)
@@ -48,18 +48,18 @@ def generate_tree_aux(root, height, length):
         for i in range(number_uncles):
             uncle = web3.eth.get_uncle_by_block(root, i)
             fork_height = web3.eth.getBlock(uncle["parentHash"])["number"]
-            if fork_height >= length:
+            if fork_height >= height_root:
                 if uncle["parentHash"][:7] not in uncle_to_append:
                     uncle_to_append[uncle["parentHash"][:7]] = [Tree(uncle["hash"][:7], [])]
                 else:
                     uncle_to_append[uncle["parentHash"][:7]] = uncle_to_append[uncle["parentHash"][:7]] + [Tree(uncle["hash"][:7], [])]
         return tree
     else: 
-        tree.children.append(generate_tree_aux(root + 1, height -1, length))
+        tree.children.append(generate_tree_aux(root + 1, height -1, height_root))
         for i in range(number_uncles):
             uncle = web3.eth.get_uncle_by_block(root, i)
             fork_height = web3.eth.getBlock(uncle["parentHash"])["number"]
-            if fork_height >= length :
+            if fork_height >= height_root:
                 if uncle["parentHash"][:7] not in uncle_to_append:
                     uncle_to_append[uncle["parentHash"][:7]] = [Tree(uncle["hash"][:7], [])]
                 else:
