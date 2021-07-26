@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ethereum's blocks</title>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    // viene utilizzata la libreria JQuery per interrogare gli elementi del file html e dirgli che lo scroll del div deve essere messo centralmente
+    $(document).ready(function() {
+        $(document).ready(function() {
+            var outerContent = $('.containerAlbero');
+            var innerContent = $('.viewContainer');
+            outerContent.scrollLeft((innerContent.width() - outerContent.width()) / 2);
+            outerContent.scrollTop((innerContent.height() - outerContent.height()) / 2);
+        });
+    });
+  </script>
+  <style>
+    .containerAlbero {
+        margin: 2% 10%;
+        width: 80%;
+        height: 600px;
+        background-color: #fafafa;
+        overflow-y: scroll;
+        overflow-y: scroll;
+    }
+  </style>
+  <!-- load the d3.js library -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <input id="num">
+  <button type="button" onclick="myFunction()">Submit</button>
+  
+  <div class="container">
+    <script src="js/main.js"></script>
+  </div>
+</body>
+</html>
