@@ -38,11 +38,11 @@ def generate_tree_aux(root, height, height_root):
 
     if height == 0:
         generate_blocks_to_append(root, uncles_number, height_root)
-        return tree
     else: 
         tree.children.append(generate_tree_aux(root + 1, height -1, height_root))
         generate_blocks_to_append(root, uncles_number, height_root)
-        return tree
+        
+    return tree
 
 def generate_blocks_to_append(root, uncles_number, height_root):
     for i in range(uncles_number):
