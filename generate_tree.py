@@ -67,7 +67,7 @@ CORS(api)
 
 @api.route('/generate-tree', methods=['GET'])
 def get_companies():
-    n = request.args.get('height')
-    return generate_tree(int(n))
+    height = request.args.get('height')
+    return generate_tree(int(height))
 
 api.run()
