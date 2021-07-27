@@ -136,7 +136,12 @@ function click(d, root) {
 }
 
 function myFunction() {
-    d3.select("div").select("div").select("svg").selectAll("g").selectAll('*').remove();
+    d3.select("div")
+      .select("div")
+      .select("svg")
+      .selectAll("g")
+      .selectAll('*')
+      .remove();
     // viene utilizzata la libreria JQuery per interrogare gli elementi del file html e dirgli che lo scroll del div deve essere messo centralmente
     $(document).ready(function() {
         $(document).ready(function() {
@@ -147,42 +152,39 @@ function myFunction() {
         });
     });
     var n = document.getElementById("num").value;
+
+    // loader settings
+    var opts = {
+        lines: 9, // The number of lines to draw
+        length: 9, // The length of each line
+        width: 5, // The line thickness
+        radius: 14, // The radius of the inner circle
+        color: '#000000', // #rgb or #rrggbb or array of colors
+        speed: 1.9, // Rounds per second
+        trail: 40, // Afterglow percentage
+        className: 'spinner', // The CSS class to assign to the spinner
+    };
+  
+    var target = document.getElementById('chart');
+    var spinner = new Spinner(opts).spin(target);
+    
     axios.get("http://localhost:5000/generate-tree?height=" + n)
-    .then(function(data){
-        // queste due istruzioni vanno fatto qua perché si devono "far scomparire i figli"
-        var root = d3.hierarchy(data.data);
+         .then(function(data) {
+             
+             spinner.stop();
 
-        root.descendants()
-            .forEach(function(d, i) {
-                d.id = i;
-                d._children = d.children;
-                d.children = null;
-            });
+             // queste due istruzioni vanno fatto qua perché si devono "far scomparire i figli"
+             var root = d3.hierarchy(data.data);
 
-        // aggiornamento del disegno
-        updateDraw(root);
-
-  }).catch(function(error) {
-        console.log("errore altezza");
-    });;
+             root.descendants()
+                 .forEach(function(d, i) {
+                     d.id = i;
+                     d._children = d.children;
+                     d.children = null;
+                 });
+             // aggiornamento del disegno
+             updateDraw(root);
+          }).catch(function(error) {
+                 console.log("errore altezza");
+             });
 }
-
-// d3.json("data/data.json")
-//   .then(function(data) {
-//         // queste due istruzioni vanno fatto qua perché si devono "far scomparire i figli"
-//         var root = d3.hierarchy(data);
-
-//         root.descendants()
-//             .forEach(function(d, i) {
-//                 d.id = i;
-//                 d._children = d.children;
-//                 d.children = null;
-//             });
-
-//         // aggiornamento del disegno
-//         updateDraw(root);
-
-//   })
-//   .catch(function(error) {
-//         console.log(error);
-//   });
