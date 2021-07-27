@@ -4,6 +4,8 @@
   <title>Ethereum's blocks</title>
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
   <meta content="utf-8" http-equiv="encoding">
+  <!-- questo serve per far riferimento al css nella cartella -->
+  <link rel="stylesheet" type="text/css" href="style.css" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script>
     // viene utilizzata la libreria JQuery per interrogare gli elementi del file html e dirgli che lo scroll del div deve essere messo centralmente
@@ -16,25 +18,20 @@
         });
     });
   </script>
-  <style>
-    .containerAlbero {
-        margin: 2% 10%;
-        width: 80%;
-        height: 600px;
-        background-color: #fafafa;
-        overflow-y: scroll;
-        overflow-y: scroll;
-    }
-  </style>
   <!-- load the d3.js library -->
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script> 
 </head>
 <body>
-  <input id="num">
-  <button type="button" onclick="myFunction()">Submit</button>
-  
+  <h1>
+    Ethereum's blocks:
+  </h1>
+  <div class="cont">
+    <label for="num">Inserisci il numero di blocco:</label>
+    <input id="num">
+    <button type="button" onclick="myFunction()">Submit</button>
+  </div>
   <div id='chart' class="container">
     <script src="js/main.js"></script>
   </div>

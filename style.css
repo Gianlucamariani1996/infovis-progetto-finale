@@ -1,0 +1,16 @@
+h1 {
+    text-align: center;
+}
+
+.containerAlbero {
+    margin: 2% 10%;
+    width: 80%;
+    height: 600px;
+    background-color: #fafafa;
+    overflow-y: scroll;
+    overflow-y: scroll;
+}
+
+.cont {
+    text-align: center;
+}
