@@ -38,8 +38,9 @@ function updateDraw(root) {
     var links = root.links();
     tree(root);
 
-    root.descendants().forEach(function (node) { node.x = node.x + height / 2;
-        node.y = node.y + width / 2;});
+    root.descendants().forEach(function (node) { 
+        node.x = node.x + height / 2;
+        node.y = node.y + 100});
 
     // clausola update per i nodi
     var node = gNode.selectAll("g")
@@ -48,7 +49,7 @@ function updateDraw(root) {
     // clausola enter per i nodi
     var nodeEnter = node.enter()
                         .append("g")
-                        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")" })
+                        .attr("transform", d => `translate(${d.y},${d.x-50})`)
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
                         .on("click", function(d) {
@@ -59,8 +60,8 @@ function updateDraw(root) {
 
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("rect")
-             .attr("width", 20)
-             .attr("height", 20)
+             .attr("width", 70)
+             .attr("height", 100)
              .attr("fill", function(d) {
                  if (d._children) 
                     return "#555";
@@ -70,7 +71,7 @@ function updateDraw(root) {
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("text")
              .attr("dy", "-0.5em")
-             .attr("x", function(d) { if (d._children) return 35; else return -6; })
+             .attr("x", "65")
              .attr("text-anchor", "end")
              .text(function(d) { return d.data.name; })
              .clone(true).lower()
@@ -144,7 +145,7 @@ function draw() {
         $(document).ready(function() {
             var outerContent = $('.containerAlbero');
             var innerContent = $('.viewContainer');
-            outerContent.scrollLeft((innerContent.width() - outerContent.width()) / 2);
+            // outerContent.scrollLeft((innerContent.width() - outerContent.width()) / 2);
             outerContent.scrollTop((innerContent.height() - outerContent.height()) / 2);
         });
     });
