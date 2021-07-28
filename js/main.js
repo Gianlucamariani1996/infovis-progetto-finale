@@ -49,12 +49,7 @@ function updateDraw(root) {
     var nodeEnter = node.enter()
                         .append("g")
                         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")" })
-                        .attr("fill-opacity", function(d) {
-                            if (d.data.name == "nullo")
-                                return 0;
-                            else
-                                return 1;
-                        })
+                        .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
                         .on("click", function(d) {
                             click(d, root);
@@ -67,30 +62,17 @@ function updateDraw(root) {
              .attr("width", 20)
              .attr("height", 20)
              .attr("fill", function(d) {
-                 var flag = "false";
-                 if (d._children) {
-                     d._children.forEach(function(figlio) {
-                         if (figlio.data.name != "nullo")
-                             flag = "true";
-                     })
-                 }
-                 if (flag == "false")
-                     return "#999";
-                 else
-                     return "#555";
+                 if (d._children) 
+                    return "#555";
+                 else return "#999";
              });
 
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("text")
              .attr("dy", "-0.5em")
              .attr("x", function(d) { if (d._children) return 35; else return -6; })
-             .attr("text-anchor", function(d) { if (d._children) return "end"; else return "end" })
-             .text(function(d) {
-                 if (d.data.name == "nullo")
-                     return "";
-                 else
-                     return d.data.name;
-             })
+             .attr("text-anchor", "end")
+             .text(function(d) { return d.data.name; })
              .clone(true).lower()
              .attr("stroke-linejoin", "round");
 
@@ -106,7 +88,7 @@ function updateDraw(root) {
         .append("path")
         .attr("d", d3.linkHorizontal().x(function(d) { return d.y })
                                       .y(function(d) { return d.x }))
-        .attr("stroke-opacity", function(d) {if (d.target.data.name == "nullo") return 0; else return 0.5});
+        .attr("stroke-opacity", function(d) { return 0.5 });
 
     // clausola exit per i link
     link.exit().remove();
@@ -115,21 +97,13 @@ function updateDraw(root) {
 
 function click(d, root) {
     // prova a richiamare updateDraw con d invece che con root e vedi che succede, magari serve per capire il codice
-    var flag = "false";
     if (d.children != null) {
         d.children = null;
         updateDraw(root);
     } else {
-        var flag = "false";
         if (d._children) {
-            d._children.forEach(function(figlio) {
-                if (figlio.data.name != "nullo")
-                    flag = "true";
-            })
-            if (flag == "true") {
-                d.children = d._children;
-                updateDraw(root);
-            }
+            d.children = d._children;
+            updateDraw(root);
         }
 
     }
@@ -139,8 +113,7 @@ function handleMouseOver(d, i) {
     d3.select(this)
       .style('fill', 'red');
 
-    svg.append("g")
-       .append('circle')
+    svg.append('circle')
        .attr('cx', d.y)
        .attr('cy', d.x)
        .attr('r', 10)
@@ -159,7 +132,7 @@ function handleMouseOut(d, i) {
     
   }
 
-function myFunction() {
+function draw() {
     d3.select("div")
       .select("div")
       .select("svg")
@@ -175,7 +148,7 @@ function myFunction() {
             outerContent.scrollTop((innerContent.height() - outerContent.height()) / 2);
         });
     });
-    var n = document.getElementById("num").value;
+    var n = document.getElementById("blockNum").value;
 
     // loader settings
     var opts = {
@@ -209,6 +182,6 @@ function myFunction() {
              // aggiornamento del disegno
              updateDraw(root);
           }).catch(function(error) {
-                 console.log("errore altezza");
+                 console.log(error);
              });
 }

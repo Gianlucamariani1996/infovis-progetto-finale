@@ -19,32 +19,29 @@ if (web3.isConnected()):
 else:
     print("Connection refused" + "\n")
 
-blocks_to_append = {}
-
-def generate_tree(num_block):
-    generated_tree = generate_tree_aux(num_block - 5, 9, num_block - 5)
-
+def generate_tree(block_num):
+    blocks_to_append = {}
+    generated_tree = generate_tree_aux(block_num - 5, 9, block_num - 5, blocks_to_append)
     append_blocks(generated_tree, blocks_to_append)
 
     string_of_tree = json.dumps(generated_tree.__dict__)
-    
     return string_of_tree
 
-def generate_tree_aux(root, height, height_root):
+def generate_tree_aux(root, height, height_root, blocks_to_append):
     root_hash = web3.eth.getBlock(root)["hash"].hex()[:7]
     uncles_number = web3.eth.get_uncle_count(root)
 
     tree = Tree(root_hash, [])
 
     if height == 0:
-        generate_blocks_to_append(root, uncles_number, height_root)
+        generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
     else: 
-        tree.children.append(generate_tree_aux(root + 1, height -1, height_root))
-        generate_blocks_to_append(root, uncles_number, height_root)
+        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append))
+        generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
         
     return tree
 
-def generate_blocks_to_append(root, uncles_number, height_root):
+def generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append):
     for i in range(uncles_number):
         uncle = web3.eth.get_uncle_by_block(root, i)
         fork_height = web3.eth.getBlock(uncle["parentHash"])["number"]
