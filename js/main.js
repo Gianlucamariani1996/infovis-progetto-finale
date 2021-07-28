@@ -9,7 +9,8 @@ var height = 6000;
 
 var div = d3.select("div")
             .append("div")
-            .classed('containerAlbero', true);
+            .classed('containerAlbero', true)
+            .attr("id", "chart");
 
 var svg = d3.select("div")
             .select("div")
@@ -49,7 +50,7 @@ function updateDraw(root) {
     // clausola enter per i nodi
     var nodeEnter = node.enter()
                         .append("g")
-                        .attr("transform", d => `translate(${d.y},${d.x-50})`)
+                        .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 50) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
                         .on("click", function(d) {
