@@ -38,19 +38,17 @@ function updateDraw(root) {
     var links = root.links();
     tree(root);
 
-    root.descendants().forEach(node => {
-        node.x = node.x + height/2;
-        node.y = node.y + width/2;
-    });
+    root.descendants().forEach(function (node) { node.x = node.x + height / 2;
+        node.y = node.y + width / 2;});
 
     // clausola update per i nodi
     var node = gNode.selectAll("g")
-                    .data(nodes, d => d.id);
+                    .data(nodes, function(d) { return d.id });
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
                         .append("g")
-                        .attr("transform", d => `translate(${d.y},${d.x})`)
+                        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")" })
                         .attr("fill-opacity", function(d) {
                             if (d.data.name == "nullo")
                                 return 0;
@@ -60,7 +58,9 @@ function updateDraw(root) {
                         .attr("stroke-opacity", 1)
                         .on("click", function(d) {
                             click(d, root);
-                        });
+                        })
+                        .on("mouseover", handleMouseOver)
+                        .on("mouseout", handleMouseOut);
 
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("rect")
@@ -69,7 +69,7 @@ function updateDraw(root) {
              .attr("fill", function(d) {
                  var flag = "false";
                  if (d._children) {
-                     d._children.forEach(figlio => {
+                     d._children.forEach(function(figlio) {
                          if (figlio.data.name != "nullo")
                              flag = "true";
                      })
@@ -83,8 +83,8 @@ function updateDraw(root) {
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("text")
              .attr("dy", "-0.5em")
-             .attr("x", d => d._children ? 35 : -6)
-             .attr("text-anchor", d => d._children ? "end" : "end")
+             .attr("x", function(d) { if (d._children) return 35; else return -6; })
+             .attr("text-anchor", function(d) { if (d._children) return "end"; else return "end" })
              .text(function(d) {
                  if (d.data.name == "nullo")
                      return "";
@@ -99,14 +99,14 @@ function updateDraw(root) {
 
     // clausola update per i link
     var link = gLink.selectAll("path")
-                    .data(links, d => d.target.id);
+                    .data(links, function(d) { return d.target.id});
 
     // clausola enter per i link
     link.enter()
         .append("path")
-        .attr("d", d3.linkHorizontal().x(d => d.y)
-                                        .y(d => d.x))
-        .attr("stroke-opacity", d => d.target.data.name == "nullo" ? 0 : 0.5);
+        .attr("d", d3.linkHorizontal().x(function(d) { return d.y })
+                                      .y(function(d) { return d.x }))
+        .attr("stroke-opacity", function(d) {if (d.target.data.name == "nullo") return 0; else return 0.5});
 
     // clausola exit per i link
     link.exit().remove();
@@ -122,7 +122,7 @@ function click(d, root) {
     } else {
         var flag = "false";
         if (d._children) {
-            d._children.forEach(figlio => {
+            d._children.forEach(function(figlio) {
                 if (figlio.data.name != "nullo")
                     flag = "true";
             })
@@ -134,6 +134,30 @@ function click(d, root) {
 
     }
 }
+
+function handleMouseOver(d, i) {
+    d3.select(this)
+      .style('fill', 'red');
+
+    svg.append("g")
+       .append('circle')
+       .attr('cx', d.y)
+       .attr('cy', d.x)
+       .attr('r', 10)
+       .attr('id', "t" + d.x + "-" + d.y + "-" + i)
+       .style('stroke', 'blue')
+       .style('stroke-width', 2)
+       .style('fill', 'red');
+}
+
+function handleMouseOut(d, i) {
+    d3.select(this)
+      .style('fill', 'black');
+
+    // Select text by id and then remove
+    d3.select("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location
+    
+  }
 
 function myFunction() {
     d3.select("div")
