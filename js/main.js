@@ -4,12 +4,11 @@
 
 var dy = 110;
 var dx = 160;
-var width = 5000;
-var height = 6000;
+var width = 1400;
+var height = 400;
 
 var div = d3.select("div")
             .append("div")
-            .classed('containerAlbero', true)
             .attr("id", "chart");
 
 // var zoom = d3.zoom().on("zoom", zoomed);
@@ -17,25 +16,15 @@ var div = d3.select("div")
 var svg = d3.select("div")
             .select("div")
             .append("svg")
-            .classed('viewContainer', true)
             .style("font", "16px sans-serif")
             .attr("width", width)
             .attr("height", height)
-            .attr("id", "svg");
-            // .call(zoom)
-            // .on("dblclick.zoom", null)
-
-// d3.select("#zoom_in").on("click", function() {
-//     zoom.scaleBy(svg.transition().duration(750), 1.2);
-//     });
-//     d3.select("#zoom_out").on("click", function() {
-//     zoom.scaleBy(svg.transition().duration(750), 0.8);
-//     });
-    
-//     function zoomed() {
-//         svg.attr("transform", d3.event.transform);
-//     }
-
+            .attr("id", "svg")
+            .call(d3.zoom() 
+                        .scaleExtent([-1, 10])  
+                        .on("zoom", zoom))
+            .append("g");
+            
 // ragionare un attimo su come mettere queste variabili anche in base al progetto precedente
 var tree = d3.tree().nodeSize([dx, dy]);
 
@@ -48,6 +37,10 @@ var gLink = svg.append("g")
                .attr("stroke", "#555")
                .attr("stroke-opacity", 0.4)
                .attr("stroke-width", 1.5);
+
+function zoom() {
+    svg.attr('transform', d3.event.transform);
+}
 
 function updateDraw(root) {
     var nodes = root.descendants();
@@ -129,51 +122,60 @@ function click(d, root) {
 
 function handleMouseOver(d, i) {
     d3.select(this)
-      .style('fill', 'red');
-
-    var g = svg.append('g')
-               .attr('id', "t" + d.x + "-" + d.y + "-" + i)
+      .select("text")
+      .attr("fill", "red");
 
     // si controlla se si sta su un blocco della catena principale oppure si è su un blocco abortito
     if (d.data.uncles != null) {
-        g.append('text')
-         .attr('x', d.y - 15)
-         .attr('y', d.x + 20)
-         .text("numero di transazioni: " + d.data.trans_num)
-         .attr("text-anchor", "start")
+        d3.select(this)
+          .append('text')
+          .attr("dy", "2em")
+          .attr("x", -10)
+          .text("numero di transazioni: " + d.data.trans_num)
+          .attr("text-anchor", "start")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
-         g.append('text')
-         .attr('x', d.y - 15)
-         .attr('y', d.x + 40)
-         .text("blocchi pagati: " + d.data.uncles)
-         .attr("text-anchor", "start")
+        d3.select(this)
+          .append('text')
+          .attr("dy", "4em")
+          .attr("x", -10)
+          .text("blocchi pagati: " + d.data.uncles)
+          .attr("text-anchor", "start")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
-         g.append('text')
-         .attr('x', d.y - 15)
-         .attr('y', d.x + 60)
-         .text("limite di gas: " + d.data.gas_limit)
-         .attr("text-anchor", "start")
+        d3.select(this)
+          .append('text')
+          .attr("dy", "6em")
+          .attr("x", -10)
+          .text("limite di gas: " + d.data.gas_limit)
+          .attr("text-anchor", "start")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
-         g.append('text')
-         .attr('x', d.y - 15)
-         .attr('y', d.x + 80)
-         .text("gas usato: " + d.data.gas_used)
-         .attr("text-anchor", "start")
+        d3.select(this)
+          .append('text')
+          .attr("dy", "8em")
+          .attr("x", -10)
+          .text("gas usato: " + d.data.gas_used)
+          .attr("text-anchor", "start")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
     }
     else 
-        g.append('text')
-         .attr('x', d.y - 15)
-         .attr('y', d.x + 20)
-         .text("blocco abortito")
-         .attr("text-anchor", "start")
+        d3.select(this)
+          .append('text')
+          .attr("dy", "2em")
+          .attr("x", -10)
+          .text("blocco abortito")
+          .attr("text-anchor", "start")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 }
 
 function handleMouseOut(d, i) {
     d3.select(this)
-      .style('fill', 'black');
+      .select("text")
+      .attr("fill", "black");
 
     // Select text by id and then remove
-    d3.select("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location
+    d3.selectAll("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location
     
   }
 
@@ -181,18 +183,11 @@ function draw() {
     d3.select("div")
       .select("div")
       .select("svg")
-      .selectAll("g")
-      .selectAll('*')
+      .select("g")
+      .selectAll('g')
+      .selectAll("*")
       .remove();
-    // viene utilizzata la libreria JQuery per interrogare gli elementi del file html e dirgli che lo scroll del div deve essere messo centralmente
-    $(document).ready(function() {
-        $(document).ready(function() {
-            var outerContent = $('.containerAlbero');
-            var innerContent = $('.viewContainer');
-            // outerContent.scrollLeft((innerContent.width() - outerContent.width()) / 2);
-            outerContent.scrollTop((innerContent.height() - outerContent.height()) / 2);
-        });
-    });
+
     var blockNum = document.getElementById("blockNum").value;
 
     // loader settings

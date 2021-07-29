@@ -6,18 +6,6 @@
   <meta content="utf-8" http-equiv="encoding">
   <!-- questo serve per far riferimento al css nella cartella -->
   <link rel="stylesheet" type="text/css" href="style.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script>
-    // viene utilizzata la libreria JQuery per interrogare gli elementi del file html e dirgli che lo scroll del div deve essere messo centralmente
-    $(document).ready(function() {
-        $(document).ready(function() {
-            var outerContent = $('.containerAlbero');
-            var innerContent = $('.viewContainer');
-            // outerContent.scrollLeft((innerContent.width() - outerContent.width()) / 2);
-            outerContent.scrollTop((innerContent.height() - outerContent.height()) / 2);
-        });
-    });
-  </script>
   <!-- load the d3.js library -->
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -34,8 +22,6 @@
     <!-- <button id="zoom_in">+</button>
     <button id="zoom_out">-</button> -->
   </div>
-  <div class="container">
-    <script src="js/main.js"></script>
-  </div>
+  <script src="js/main.js"></script>
 </body>
 </html>
