@@ -25,7 +25,7 @@ else:
 
 def generate_tree(block_num):
     blocks_to_append = {}
-    generated_tree = generate_tree_aux(block_num - 5, 20, block_num - 5, blocks_to_append)
+    generated_tree = generate_tree_aux(block_num - 5, 9, block_num - 5, blocks_to_append)
     append_blocks(generated_tree, blocks_to_append)
 
     string_of_tree = json.dumps(generated_tree.__dict__)

@@ -5,7 +5,7 @@
 var dy = 110;
 var dx = 160;
 var width = 1400;
-var height = 400;
+var height = 350;
 
 var div = d3.select("div")
             .append("div")
@@ -72,7 +72,7 @@ function updateDraw(root) {
              .attr("width", 30)
              .attr("height", 10)
              .attr("fill", function(d) {
-                 if (d._children) 
+                 if (d.children) 
                     return "#555";
                  else return "#999";
              });
@@ -91,7 +91,7 @@ function updateDraw(root) {
 
     // clausola update per i link
     var link = gLink.selectAll("path")
-                    .data(links, function(d) { return d.target.id});
+                    .data(links, function(d) { return d.target.id });
 
     // clausola enter per i link
     link.enter()
@@ -109,13 +109,15 @@ function click(d, root) {
     // prova a richiamare updateDraw con d invece che con root e vedi che succede, magari serve per capire il codice
 
     // questo è il caso in cui si clicca per chiudere i nodi
-    if (d.children != null) {
+    if (d.children) {
+        d._children = d.children;
         d.children = null;
         updateDraw(root);
     } 
     // questo è il caso in cui si clicca per aprire i nodi
     else if (d._children) {
         d.children = d._children;
+        d._children = null;
         updateDraw(root);
     }
 }
@@ -213,12 +215,6 @@ function draw() {
              // queste due istruzioni vanno fatto qua perché si devono "far scomparire i figli"
              var root = d3.hierarchy(data.data);
 
-             root.descendants()
-                 .forEach(function(d, i) {
-                     d.id = i;
-                     d._children = d.children;
-                     d.children = null;
-                 });
              // aggiornamento del disegno
              updateDraw(root);
          }).catch(function(error) {

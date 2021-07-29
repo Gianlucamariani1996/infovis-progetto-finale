@@ -9,3 +9,7 @@ h1 {
 svg { 
     border: 1px dotted black;
 }
+
+div {
+    padding:12px;
+}
