@@ -4,12 +4,16 @@ from flask import Flask, json, request
 from flask_cors import CORS
 
 class Tree(dict):
-    def __init__(self, name, children=None):
+    def __init__(self, name, trans_num=None, uncles=None, gas_limit=None, gas_used=None, children=None):
         super().__init__()
         self.__dict__ = self
         self.name = name
+        self.trans_num = trans_num
+        self.uncles = uncles
+        self.gas_limit = gas_limit
+        self.gas_used = gas_used
         if children is not None:
-            self.children = list(children)
+            self.children = children
         else:
             self.children = []
 
@@ -21,17 +25,24 @@ else:
 
 def generate_tree(block_num):
     blocks_to_append = {}
-    generated_tree = generate_tree_aux(block_num - 5, 9, block_num - 5, blocks_to_append)
+    generated_tree = generate_tree_aux(block_num - 5, 20, block_num - 5, blocks_to_append)
     append_blocks(generated_tree, blocks_to_append)
 
     string_of_tree = json.dumps(generated_tree.__dict__)
     return string_of_tree
 
 def generate_tree_aux(root, height, height_root, blocks_to_append):
-    root_hash = web3.eth.getBlock(root)["hash"].hex()[:7]
+    block = web3.eth.getBlock(root)
+    root_hash = block["hash"].hex()[:7]
     uncles_number = web3.eth.get_uncle_count(root)
+    trans_num = web3.eth.get_block_transaction_count(root)
+    uncles = []
+    for i in range(uncles_number):
+        uncles.append(web3.eth.get_uncle_by_block(root, i)['hash'][:7])
+    gas_limit = block['gasLimit']
+    gas_used = block['gasUsed']
 
-    tree = Tree(root_hash, [])
+    tree = Tree(root_hash, trans_num, uncles, gas_limit, gas_used)
 
     if height == 0:
         generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
@@ -47,9 +58,9 @@ def generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append
         fork_height = web3.eth.getBlock(uncle["parentHash"])["number"]
         if fork_height >= height_root:
             if uncle["parentHash"][:7] not in blocks_to_append:
-                blocks_to_append[uncle["parentHash"][:7]] = [Tree(uncle["hash"][:7], [])]
+                blocks_to_append[uncle["parentHash"][:7]] = [Tree(uncle["hash"][:7])]
             else:
-                blocks_to_append[uncle["parentHash"][:7]] = blocks_to_append[uncle["parentHash"][:7]] + [Tree(uncle["hash"][:7], [])]
+                blocks_to_append[uncle["parentHash"][:7]] = blocks_to_append[uncle["parentHash"][:7]] + [Tree(uncle["hash"][:7])]
 
 def append_blocks(tree, blocks_to_append):
     for key in blocks_to_append:

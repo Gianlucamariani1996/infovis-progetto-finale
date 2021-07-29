@@ -12,6 +12,8 @@ var div = d3.select("div")
             .classed('containerAlbero', true)
             .attr("id", "chart");
 
+// var zoom = d3.zoom().on("zoom", zoomed);
+
 var svg = d3.select("div")
             .select("div")
             .append("svg")
@@ -20,6 +22,19 @@ var svg = d3.select("div")
             .attr("width", width)
             .attr("height", height)
             .attr("id", "svg");
+            // .call(zoom)
+            // .on("dblclick.zoom", null)
+
+// d3.select("#zoom_in").on("click", function() {
+//     zoom.scaleBy(svg.transition().duration(750), 1.2);
+//     });
+//     d3.select("#zoom_out").on("click", function() {
+//     zoom.scaleBy(svg.transition().duration(750), 0.8);
+//     });
+    
+//     function zoomed() {
+//         svg.attr("transform", d3.event.transform);
+//     }
 
 // ragionare un attimo su come mettere queste variabili anche in base al progetto precedente
 var tree = d3.tree().nodeSize([dx, dy]);
@@ -50,7 +65,7 @@ function updateDraw(root) {
     // clausola enter per i nodi
     var nodeEnter = node.enter()
                         .append("g")
-                        .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 50) + ")" })
+                        .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
                         .on("click", function(d) {
@@ -61,8 +76,8 @@ function updateDraw(root) {
 
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("rect")
-             .attr("width", 70)
-             .attr("height", 100)
+             .attr("width", 30)
+             .attr("height", 10)
              .attr("fill", function(d) {
                  if (d._children) 
                     return "#555";
@@ -90,7 +105,7 @@ function updateDraw(root) {
         .append("path")
         .attr("d", d3.linkHorizontal().x(function(d) { return d.y })
                                       .y(function(d) { return d.x }))
-        .attr("stroke-opacity", function(d) { return 0.5 });
+        .attr("stroke-opacity", 0.5);
 
     // clausola exit per i link
     link.exit().remove();
@@ -99,15 +114,16 @@ function updateDraw(root) {
 
 function click(d, root) {
     // prova a richiamare updateDraw con d invece che con root e vedi che succede, magari serve per capire il codice
+
+    // questo è il caso in cui si clicca per chiudere i nodi
     if (d.children != null) {
         d.children = null;
         updateDraw(root);
-    } else {
-        if (d._children) {
-            d.children = d._children;
-            updateDraw(root);
-        }
-
+    } 
+    // questo è il caso in cui si clicca per aprire i nodi
+    else if (d._children) {
+        d.children = d._children;
+        updateDraw(root);
     }
 }
 
@@ -115,14 +131,41 @@ function handleMouseOver(d, i) {
     d3.select(this)
       .style('fill', 'red');
 
-    svg.append('circle')
-       .attr('cx', d.y)
-       .attr('cy', d.x)
-       .attr('r', 10)
-       .attr('id', "t" + d.x + "-" + d.y + "-" + i)
-       .style('stroke', 'blue')
-       .style('stroke-width', 2)
-       .style('fill', 'red');
+    var g = svg.append('g')
+               .attr('id', "t" + d.x + "-" + d.y + "-" + i)
+
+    // si controlla se si sta su un blocco della catena principale oppure si è su un blocco abortito
+    if (d.data.uncles != null) {
+        g.append('text')
+         .attr('x', d.y - 15)
+         .attr('y', d.x + 20)
+         .text("numero di transazioni: " + d.data.trans_num)
+         .attr("text-anchor", "start")
+
+         g.append('text')
+         .attr('x', d.y - 15)
+         .attr('y', d.x + 40)
+         .text("blocchi pagati: " + d.data.uncles)
+         .attr("text-anchor", "start")
+
+         g.append('text')
+         .attr('x', d.y - 15)
+         .attr('y', d.x + 60)
+         .text("limite di gas: " + d.data.gas_limit)
+         .attr("text-anchor", "start")
+
+         g.append('text')
+         .attr('x', d.y - 15)
+         .attr('y', d.x + 80)
+         .text("gas usato: " + d.data.gas_used)
+         .attr("text-anchor", "start")
+    }
+    else 
+        g.append('text')
+         .attr('x', d.y - 15)
+         .attr('y', d.x + 20)
+         .text("blocco abortito")
+         .attr("text-anchor", "start")
 }
 
 function handleMouseOut(d, i) {
@@ -150,7 +193,7 @@ function draw() {
             outerContent.scrollTop((innerContent.height() - outerContent.height()) / 2);
         });
     });
-    var n = document.getElementById("blockNum").value;
+    var blockNum = document.getElementById("blockNum").value;
 
     // loader settings
     var opts = {
@@ -167,7 +210,7 @@ function draw() {
     var target = document.getElementById('chart');
     var spinner = new Spinner(opts).spin(target);
     
-    axios.get("http://localhost:5000/generate-tree?height=" + n)
+    axios.get("http://localhost:5000/generate-tree?height=" + blockNum)
          .then(function(data) {
              
              spinner.stop();
@@ -183,7 +226,7 @@ function draw() {
                  });
              // aggiornamento del disegno
              updateDraw(root);
-          }).catch(function(error) {
+         }).catch(function(error) {
                  console.log(error);
-             });
+            });
 }
