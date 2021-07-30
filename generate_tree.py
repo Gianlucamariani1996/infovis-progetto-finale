@@ -25,7 +25,10 @@ else:
 
 def generate_tree(block_num, height):
     blocks_to_append = {}
-    generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append)
+    if block_num >= 7:
+        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append)
+    else:
+        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append)
     append_blocks(generated_tree, blocks_to_append)
 
     string_of_tree = json.dumps(generated_tree.__dict__)
