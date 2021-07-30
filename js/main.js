@@ -22,25 +22,23 @@ var svg = d3.select("div")
             .attr("id", "svg")
             .call(d3.zoom() 
                         .scaleExtent([-1, 10])  
-                        .on("zoom", zoom))
+                        .on("zoom", function() { svg.attr('transform', d3.event.transform); }))
             .append("g");
             
 // ragionare un attimo su come mettere queste variabili anche in base al progetto precedente
 var tree = d3.tree().nodeSize([dx, dy]);
 
+// inizialmente vuoti
 var gNode = svg.append("g")
                .attr("cursor", "pointer")
                .attr("pointer-events", "all");
 
+// inizialmente vuoti
 var gLink = svg.append("g")
                .attr("fill", "none")
                .attr("stroke", "#555")
                .attr("stroke-opacity", 0.4)
                .attr("stroke-width", 1.5);
-
-function zoom() {
-    svg.attr('transform', d3.event.transform);
-}
 
 function updateDraw(root) {
     var nodes = root.descendants();
@@ -49,7 +47,8 @@ function updateDraw(root) {
 
     root.descendants().forEach(function (node) { 
         node.x = node.x + height / 2;
-        node.y = node.y + 100});
+        node.y = node.y + 100;
+      });
 
     // clausola update per i nodi
     var node = gNode.selectAll("g")
