@@ -190,6 +190,7 @@ function draw() {
       .remove();
 
     var blockNum = document.getElementById("blockNum").value;
+    var treeHeight = document.getElementById("treeHeight").value;
 
     // loader settings
     var opts = {
@@ -206,7 +207,7 @@ function draw() {
     var target = document.getElementById('chart');
     var spinner = new Spinner(opts).spin(target);
     
-    axios.get("http://localhost:5000/generate-tree?height=" + blockNum)
+    axios.get("http://localhost:5000/generate-tree?block=" + blockNum + "&height=" + treeHeight)
          .then(function(data) {
              
              spinner.stop();

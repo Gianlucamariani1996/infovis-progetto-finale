@@ -23,9 +23,9 @@ if (web3.isConnected()):
 else:
     print("Connection refused" + "\n")
 
-def generate_tree(block_num):
+def generate_tree(block_num, height):
     blocks_to_append = {}
-    generated_tree = generate_tree_aux(block_num - 5, 9, block_num - 5, blocks_to_append)
+    generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append)
     append_blocks(generated_tree, blocks_to_append)
 
     string_of_tree = json.dumps(generated_tree.__dict__)
@@ -75,7 +75,8 @@ CORS(api)
 
 @api.route('/generate-tree', methods=['GET'])
 def get_companies():
+    block = request.args.get('block')
     height = request.args.get('height')
-    return generate_tree(int(height))
+    return generate_tree(int(block), int(height))
 
 api.run()
