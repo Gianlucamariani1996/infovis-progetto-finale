@@ -76,12 +76,12 @@ function updateDraw(root) {
                  else return "#999";
              });
 
-    // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
+    // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra 
     nodeEnter.append("text")
              .attr("dy", "-0.5em")
              .attr("x", "65")
              .attr("text-anchor", "end")
-             .text(function(d) { return d.data.name; })
+             .text(function(d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); })
              .clone(true).lower()
              .attr("stroke-linejoin", "round");
 
@@ -140,7 +140,8 @@ function handleMouseOver(d, i) {
           .append('text')
           .attr("dy", "4em")
           .attr("x", -10)
-          .text("blocchi pagati: " + d.data.uncles)
+          // .text("blocchi pagati: " + d.data.uncles.slice(0, 3) + "..." + d.data.uncles.slice(63, 66))
+          .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 

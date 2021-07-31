@@ -36,12 +36,12 @@ def generate_tree(block_num, height):
 
 def generate_tree_aux(root, height, height_root, blocks_to_append):
     block = web3.eth.getBlock(root)
-    root_hash = block["hash"].hex()[:7]
+    root_hash = block["hash"].hex()
     uncles_number = web3.eth.get_uncle_count(root)
     trans_num = web3.eth.get_block_transaction_count(root)
     uncles = []
     for i in range(uncles_number):
-        uncles.append(web3.eth.get_uncle_by_block(root, i)['hash'][:7])
+        uncles.append(web3.eth.get_uncle_by_block(root, i)['hash'])
     gas_limit = block['gasLimit']
     gas_used = block['gasUsed']
 
@@ -60,10 +60,10 @@ def generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append
         uncle = web3.eth.get_uncle_by_block(root, i)
         fork_height = web3.eth.getBlock(uncle["parentHash"])["number"]
         if fork_height >= height_root:
-            if uncle["parentHash"][:7] not in blocks_to_append:
-                blocks_to_append[uncle["parentHash"][:7]] = [Tree(uncle["hash"][:7])]
+            if uncle["parentHash"] not in blocks_to_append:
+                blocks_to_append[uncle["parentHash"]] = [Tree(uncle["hash"])]
             else:
-                blocks_to_append[uncle["parentHash"][:7]] = blocks_to_append[uncle["parentHash"][:7]] + [Tree(uncle["hash"][:7])]
+                blocks_to_append[uncle["parentHash"]] = blocks_to_append[uncle["parentHash"]] + [Tree(uncle["hash"])]
 
 def append_blocks(tree, blocks_to_append):
     for key in blocks_to_append:
