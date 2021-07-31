@@ -11,8 +11,6 @@ var div = d3.select("div")
             .append("div")
             .attr("id", "chart");
 
-// var zoom = d3.zoom().on("zoom", zoomed);
-
 var svg = d3.select("div")
             .select("div")
             .append("svg")
@@ -21,11 +19,10 @@ var svg = d3.select("div")
             .attr("height", height)
             .attr("id", "svg")
             .call(d3.zoom() 
-                        .scaleExtent([-1, 10])  
-                        .on("zoom", function() { svg.attr('transform', d3.event.transform); }))
+                    .scaleExtent([-1, 10])  
+                    .on("zoom", function() { svg.attr('transform', d3.event.transform); }))
             .append("g");
-            
-// ragionare un attimo su come mettere queste variabili anche in base al progetto precedente
+        
 var tree = d3.tree().nodeSize([dx, dy]);
 
 // inizialmente vuoti
@@ -43,6 +40,7 @@ var gLink = svg.append("g")
 function updateDraw(root) {
     var nodes = root.descendants();
     var links = root.links();
+    // computazione del nuovo layout
     tree(root);
 
     root.descendants().forEach(function (node) { 
@@ -119,6 +117,7 @@ function click(d, root) {
         d._children = null;
         updateDraw(root);
     }
+
 }
 
 function handleMouseOver(d, i) {
@@ -140,7 +139,6 @@ function handleMouseOver(d, i) {
           .append('text')
           .attr("dy", "4em")
           .attr("x", -10)
-          // .text("blocchi pagati: " + d.data.uncles.slice(0, 3) + "..." + d.data.uncles.slice(63, 66))
           .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
@@ -169,6 +167,7 @@ function handleMouseOver(d, i) {
           .text("blocco abortito")
           .attr("text-anchor", "start")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+
 }
 
 function handleMouseOut(d, i) {
@@ -213,7 +212,6 @@ function draw() {
              
              spinner.stop();
 
-             // queste due istruzioni vanno fatto qua perché si devono "far scomparire i figli"
              var root = d3.hierarchy(data.data);
 
              // aggiornamento del disegno
@@ -221,4 +219,5 @@ function draw() {
          }).catch(function(error) {
                  console.log(error);
             });
+
 }
