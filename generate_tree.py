@@ -4,10 +4,11 @@ from flask import Flask, json, request
 from flask_cors import CORS
 
 class Tree(dict):
-    def __init__(self, name, trans_num=None, uncles=None, gas_limit=None, gas_used=None, children=None):
+    def __init__(self, name, height=None, trans_num=None, uncles=None, gas_limit=None, gas_used=None, children=None):
         super().__init__()
         self.__dict__ = self
         self.name = name
+        self.height = height
         self.trans_num = trans_num
         self.uncles = uncles
         self.gas_limit = gas_limit
@@ -38,6 +39,7 @@ def generate_tree_aux(root, height, height_root, blocks_to_append):
     block = web3.eth.getBlock(root)
     root_hash = block["hash"].hex()
     uncles_number = web3.eth.get_uncle_count(root)
+    block_height = block["number"]
     trans_num = web3.eth.get_block_transaction_count(root)
     uncles = []
     for i in range(uncles_number):
@@ -45,7 +47,7 @@ def generate_tree_aux(root, height, height_root, blocks_to_append):
     gas_limit = block['gasLimit']
     gas_used = block['gasUsed']
 
-    tree = Tree(root_hash, trans_num, uncles, gas_limit, gas_used)
+    tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used)
 
     if height == 0:
         generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
