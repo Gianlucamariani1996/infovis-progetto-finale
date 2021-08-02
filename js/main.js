@@ -236,10 +236,12 @@ function draw() {
     
     axios.get("http://localhost:5000/generate-tree?block=" + blockNum + "&height=" + treeHeight)
          .then(function(data) {
-             
              spinner.stop();
 
-             var root = d3.hierarchy(data.data);
+             var root = d3.hierarchy(data.data[2]);
+
+            //  console.log(data.data[0])
+            //  console.log(data.data[1])
 
              // aggiornamento del disegno
              updateDraw(root);

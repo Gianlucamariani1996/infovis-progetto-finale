@@ -26,16 +26,18 @@ else:
 
 def generate_tree(block_num, height):
     blocks_to_append = {}
+    total_trans_uncles_number = [0, 0]
     if block_num >= 7:
-        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append)
+        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number)
     else:
-        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append)
+        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number)
+
     append_blocks(generated_tree, blocks_to_append)
 
-    string_of_tree = json.dumps(generated_tree.__dict__)
-    return string_of_tree
+    string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], generated_tree])
+    return string_of_trans_uncles_tree
 
-def generate_tree_aux(root, height, height_root, blocks_to_append):
+def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number):
     block = web3.eth.getBlock(root)
     root_hash = block["hash"].hex()
     uncles_number = web3.eth.get_uncle_count(root)
@@ -47,12 +49,14 @@ def generate_tree_aux(root, height, height_root, blocks_to_append):
     gas_limit = block['gasLimit']
     gas_used = block['gasUsed']
 
+    total_trans_uncles_number[0] += trans_num
+    total_trans_uncles_number[1] += uncles_number
     tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used)
 
     if height == 0:
         generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
     else: 
-        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append))
+        tree.children.append(generate_tree_aux(root + 1, height - 1, height_root, blocks_to_append, total_trans_uncles_number))
         generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
         
     return tree
