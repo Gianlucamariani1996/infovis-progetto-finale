@@ -2,8 +2,8 @@
  * Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
  */
 
-var dy = 160;
-var dx = 200;
+var dy = 200;
+var dx = 240;
 var width = 1200;
 var height = 400;
 
@@ -128,19 +128,27 @@ function handleMouseOver(d, i) {
     // si controlla se si sta su un blocco della catena principale oppure si è su un blocco abortito
     if (d.data.uncles != null) {
 
-        // d3.select(this)
-        //   .append("rect")
-        //   .attr("y", 15)
-        //   .attr("x", -15)
-        //   .attr("width", 220)
-        //   .attr("height", 160)
-        //   .attr("stroke", "#000000")
-        //   .attr("fill", "none")
-        //   .attr('id', "t" + d.x + "-" + d.y + "-" + i); 
+        d3.select(this)
+          .append("rect")
+          .attr("y", 15)
+          .attr("x", -15)
+          .attr("width", 620)
+          .attr("height", 190)
+          .attr("stroke", "#000000")
+          .attr("fill", "none")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
         d3.select(this)
           .append('text')
           .attr("dy", "2em")
+          .attr("x", -10)
+          .text("hash: " + d.data.name)
+          .attr("text-anchor", "start")
+          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+
+        d3.select(this)
+          .append('text')
+          .attr("dy", "4em")
           .attr("x", -10)
           .text("altezza/numero di blocco: " + d.data.height)
           .attr("text-anchor", "start")
@@ -148,7 +156,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "4em")
+          .attr("dy", "6em")
           .attr("x", -10)
           .text("numero di transazioni: " + d.data.trans_num)
           .attr("text-anchor", "start")
@@ -156,7 +164,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "6em")
+          .attr("dy", "8em")
           .attr("x", -10)
           .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
@@ -164,7 +172,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "8em")
+          .attr("dy", "10em")
           .attr("x", -10)
           .text("limite di gas: " + d.data.gas_limit)
           .attr("text-anchor", "start")
@@ -172,7 +180,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "10em")
+          .attr("dy", "12em")
           .attr("x", -10)
           .text("gas usato: " + d.data.gas_used)
           .attr("text-anchor", "start")
