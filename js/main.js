@@ -132,7 +132,7 @@ function handleMouseOver(d, i) {
           .append("rect")
           .attr("y", 15)
           .attr("x", -15)
-          .attr("width", 620)
+          .attr("width", 640)
           .attr("height", 190)
           .attr("stroke", "#000000")
           .attr("fill", "none")
