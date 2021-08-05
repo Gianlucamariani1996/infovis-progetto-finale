@@ -27,17 +27,18 @@ else:
 def generate_tree(block_num, height):
     blocks_to_append = {}
     total_trans_uncles_number = [0, 0]
+    links_uncle_reward = []
     if block_num >= 7:
-        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number)
+        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward)
     else:
-        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number)
+        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward)
 
     append_blocks(generated_tree, blocks_to_append)
 
-    string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], generated_tree])
+    string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], links_uncle_reward, generated_tree])
     return string_of_trans_uncles_tree
 
-def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number):
+def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward):
     block = web3.eth.getBlock(root)
     root_hash = block["hash"].hex()
     uncles_number = web3.eth.get_uncle_count(root)
@@ -54,16 +55,18 @@ def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_u
     tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used)
 
     if height == 0:
-        generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
+        generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
     else: 
-        tree.children.append(generate_tree_aux(root + 1, height - 1, height_root, blocks_to_append, total_trans_uncles_number))
-        generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append)
+        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward))
+        generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
         
     return tree
 
-def generate_blocks_to_append(root, uncles_number, height_root, blocks_to_append):
+def generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward):
     for i in range(uncles_number):
         uncle = web3.eth.get_uncle_by_block(root, i)
+
+        links_uncle_reward.append([root_hash, uncle["hash"]])
         fork_height = web3.eth.getBlock(uncle["parentHash"])["number"]
         if fork_height >= height_root:
             if uncle["parentHash"] not in blocks_to_append:

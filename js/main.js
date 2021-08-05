@@ -37,6 +37,12 @@ var gLink = svg.append("g")
                .attr("stroke-opacity", 0.4)
                .attr("stroke-width", 1.5);
 
+var gReward = svg.append("g")
+                 .attr("fill", "none")
+                 .attr("stroke", "#555")
+                 .attr("stroke-opacity", 0.4)
+                 .attr("stroke-width", 1.5)
+
 function updateDraw(root) {
     var nodes = root.descendants();
     var links = root.links();
@@ -50,7 +56,7 @@ function updateDraw(root) {
 
     // clausola update per i nodi
     var node = gNode.selectAll("g")
-                    .data(nodes, function(d) { return d.id });
+                    .data(nodes);
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
@@ -58,6 +64,7 @@ function updateDraw(root) {
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
+                        .attr("id", function(d) { return "n" + d.data.name})
                         .on("click", function(d) {
                             click(d, root);
                         })
@@ -88,7 +95,7 @@ function updateDraw(root) {
 
     // clausola update per i link
     var link = gLink.selectAll("path")
-                    .data(links, function(d) { return d.target.id });
+                    .data(links);
 
     // clausola enter per i link
     link.enter()
@@ -207,6 +214,26 @@ function handleMouseOut(d, i) {
     
   }
 
+function updateDrawReward(lst) {
+  lst.forEach(function (e) {
+    // bisogna controllare se ci sono entrambi i nodi per prendere le coordinate, potrebbe essere che un nodo risulta che ha pagato un nodo che però non è presente nella visualizzazione perché si trova in una porzione della blockchain che non viene visualizzata
+    if (!d3.select("#n" + e[0]).empty() && !d3.select("#n" + e[1]).empty())
+      gReward
+      // d3.select("#n" + e[0])
+      //   .append("g")
+      //   .attr("fill", "none")
+      //   .attr("stroke", "#555")
+      //   .attr("stroke-opacity", 0.4)
+      //   .attr("stroke-width", 1.5)
+        .append("line")
+        .attr("x1", d3.select("#n" + e[0])._groups[0][0].__data__.y)
+        .attr("x2", d3.select("#n" + e[1])._groups[0][0].__data__.y)
+        .attr("y1", d3.select("#n" + e[0])._groups[0][0].__data__.x)
+        .attr("y2", d3.select("#n" + e[1])._groups[0][0].__data__.x)
+        .attr("stroke-opacity", 0.5);
+   });
+}
+
 function draw() {
     d3.select("div")
       .select("div")
@@ -238,13 +265,14 @@ function draw() {
          .then(function(data) {
              spinner.stop();
 
-             var root = d3.hierarchy(data.data[2]);
+             var root = d3.hierarchy(data.data[3]);
 
             //  console.log(data.data[0])
             //  console.log(data.data[1])
 
              // aggiornamento del disegno
              updateDraw(root);
+             updateDrawReward(data.data[2]);
          }).catch(function(error) {
                  console.log(error);
             });
