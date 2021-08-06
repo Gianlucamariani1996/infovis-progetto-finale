@@ -43,7 +43,7 @@ var gReward = svg.append("g")
                  .attr("stroke-opacity", 0.4)
                  .attr("stroke-width", 1.5)
 
-function updateDraw(root) {
+function updateDraw(root, linkReward) {
     var nodes = root.descendants();
     var links = root.links();
     // computazione del nuovo layout
@@ -66,7 +66,7 @@ function updateDraw(root) {
                         .attr("stroke-opacity", 1)
                         .attr("id", function (d) { return "n" + d.data.name})
                         .on("click", function (d) {
-                            click(d, root);
+                            click(d, root, linkReward);
                         })
                         .on("mouseover", handleMouseOver)
                         .on("mouseout", handleMouseOut);
@@ -122,7 +122,6 @@ function updateDraw(root) {
     //         .attr("stroke-opacity", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return 1; else 0; })
     //         .attr("stroke-width", 1.5)
 
-
     // clausola exit per i nodi
     node.exit().remove();
 
@@ -142,21 +141,23 @@ function updateDraw(root) {
 
 }
 
-function click(d, root) {
+function click(d, root, linkReward) {
     // prova a richiamare updateDraw con d invece che con root e vedi che succede, magari serve per capire il codice
 
     // questo è il caso in cui si clicca per chiudere i nodi
     if (d.children) {
         d._children = d.children;
         d.children = null;
-        updateDraw(root);
+        d3.selectAll("line").remove();
     } 
     // questo è il caso in cui si clicca per aprire i nodi
     else if (d._children) {
         d.children = d._children;
         d._children = null;
-        updateDraw(root);
+        d3.selectAll("line").remove();
     }
+    updateDraw(root, linkReward);
+    updateDrawReward(linkReward);
 
 }
 
@@ -305,7 +306,7 @@ function draw() {
             //  console.log(data.data[1])
 
              // aggiornamento del disegno
-             updateDraw(root);
+             updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
          }).catch(function(error) {
                  console.log(error);
