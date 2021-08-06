@@ -11,24 +11,21 @@ var div = d3.select("div")
             .append("div")
             .attr("id", "chart");
 
-var svg = d3.select("div")
-            .select("div")
-            .append("svg")
-            .style("font", "16px sans-serif")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("id", "svg")
-            .call(d3.zoom() 
-                    .scaleExtent([-1, 10])  
-                    .on("zoom", function () { svg.attr('transform', d3.event.transform); }))
-            .append("g");
+var svg = div.append("svg")
+             .style("font", "16px sans-serif")
+             .attr("width", width)
+             .attr("height", height)
+             .attr("id", "svg")
+             .call(d3.zoom() 
+                     .scaleExtent([0.1, 1])  
+                     .on("zoom", function () { svg.attr('transform', d3.event.transform); }))
+             .append("g");
         
 var tree = d3.tree().nodeSize([dx, dy]);
 
 // inizialmente vuoti
 var gNode = svg.append("g")
-               .attr("cursor", "pointer")
-               .attr("pointer-events", "all");
+               .attr("cursor", "pointer");
 
 // inizialmente vuoti
 var gLink = svg.append("g")
@@ -41,7 +38,7 @@ var gReward = svg.append("g")
                  .attr("fill", "none")
                  .attr("stroke", "#555")
                  .attr("stroke-opacity", 0.4)
-                 .attr("stroke-width", 1.5)
+                 .attr("stroke-width", 1.5);
 
 function updateDraw(root, linkReward) {
     var nodes = root.descendants();
@@ -76,9 +73,9 @@ function updateDraw(root, linkReward) {
              .attr("width", 30)
              .attr("height", 10)
              .attr("fill", function (d) {
-                 if (d.children) 
-                    return "#555";
-                 else return "#999";
+                 if (d.children || d._children || d.data.uncles != null) 
+                    return "green";
+                 else return "red";
              });
 
     // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra 
@@ -86,41 +83,7 @@ function updateDraw(root, linkReward) {
              .attr("dy", "-0.5em")
              .attr("x", "65")
              .attr("text-anchor", "end")
-             .text(function (d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); })
-             .clone(true).lower()
-             .attr("stroke-linejoin", "round");
-
-    // var linkReward = nodeEnter.selectAll("line").data(function (d) { if (d.data.uncles != null) { console.log(d.data.uncles); return [[d.x, d.y, d.data.uncles]];} else return []; });
-
-    // linkReward.enter()
-    //           .append("line")
-    //           .attr("x1", function (d) {  console.log(d); return d[1]; })
-    //           .attr("x2", function (d) { if (!d3.select("#n" + d[2][0]).empty()) return d3.select("#n" + d[2][0])._groups[0][0].__data__.y; })
-    //           .attr("y1", function (d) { return d[0]; })
-    //           .attr("y2", function (d) { if (!d3.select("#n" + d[2][0]).empty()) return d3.select("#n" + d[2][0])._groups[0][0].__data__.x; })
-    //           .attr("fill", "none")
-    //           .attr("stroke", "#555")
-    //           .attr("stroke-opacity", 0.4)
-    //           .attr("stroke-width", 1.5)
-
-    // nodeEnter.append("line")
-    //           .attr("x1", function (d) { return d.y; })
-    //           .attr("x2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[0]).empty()) return d3.select("#n" + d.data.uncles[0])._groups[0][0].__data__.y; })
-    //           .attr("y1", function (d) { return d.x; })
-    //           .attr("y2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[0]).empty()) return d3.select("#n" + d.data.uncles[0])._groups[0][0].__data__.x; })
-    //           .attr("fill", "none")
-    //           .attr("stroke", "#555")
-    //           .attr("stroke-opacity", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[0]).empty()) return 1; else 0; })
-    //           .attr("stroke-width", 1.5)
-
-    // nodeEnter.append("line")
-    //         .attr("x1", function (d) { return d.y; })
-    //         .attr("x2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return d3.select("#n" + d.data.uncles[1])._groups[0][0].__data__.y; })
-    //         .attr("y1", function (d) { return d.x; })
-    //         .attr("y2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return d3.select("#n" + d.data.uncles[1])._groups[0][0].__data__.x; })
-    //         .attr("stroke", "#555")
-    //         .attr("stroke-opacity", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return 1; else 0; })
-    //         .attr("stroke-width", 1.5)
+             .text(function (d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); });
 
     // clausola exit per i nodi
     node.exit().remove();
@@ -133,8 +96,7 @@ function updateDraw(root, linkReward) {
     link.enter()
         .append("path")
         .attr("d", d3.linkHorizontal().x(function (d) { return d.y })
-                                      .y(function (d) { return d.x }))
-        .attr("stroke-opacity", 0.5);
+                                      .y(function (d) { return d.x }));
 
     // clausola exit per i link
     link.exit().remove();
@@ -149,15 +111,17 @@ function click(d, root, linkReward) {
         d._children = d.children;
         d.children = null;
         d3.selectAll("line").remove();
+        updateDraw(root, linkReward);
+        updateDrawReward(linkReward);
     } 
     // questo è il caso in cui si clicca per aprire i nodi
     else if (d._children) {
         d.children = d._children;
         d._children = null;
         d3.selectAll("line").remove();
+        updateDraw(root, linkReward);
+        updateDrawReward(linkReward);
     }
-    updateDraw(root, linkReward);
-    updateDrawReward(linkReward);
 
 }
 
@@ -243,8 +207,7 @@ function handleMouseOut(d, i) {
       .select("text")
       .attr("fill", "black");
 
-    // Select text by id and then remove
-    d3.selectAll("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location
+    d3.selectAll("#t" + d.x + "-" + d.y + "-" + i).remove();
     
   }
 
@@ -252,20 +215,11 @@ function updateDrawReward(lst) {
   lst.forEach(function (e) {
     // bisogna controllare se ci sono entrambi i nodi per prendere le coordinate, potrebbe essere che un nodo risulta che ha pagato un nodo che però non è presente nella visualizzazione perché si trova in una porzione della blockchain che non viene visualizzata
     if (!d3.select("#n" + e[0]).empty() && !d3.select("#n" + e[1]).empty())
-      gReward
-      // d3.select("#n" + e[0])
-      //   .append("g")
-      //   .attr("fill", "none")
-      //   .attr("stroke", "#555")
-      //   .attr("stroke-opacity", 0.4)
-      //   .attr("stroke-width", 1.5)
-        .append("line")
-        .attr("x1", d3.select("#n" + e[0])._groups[0][0].__data__.y)
-        .attr("x2", d3.select("#n" + e[1])._groups[0][0].__data__.y)
-        .attr("y1", d3.select("#n" + e[0])._groups[0][0].__data__.x)
-        .attr("y2", d3.select("#n" + e[1])._groups[0][0].__data__.x)
-        .attr("id", "#l" + e[0])
-        .attr("stroke-opacity", 0.5);
+      gReward.append("line")
+             .attr("x1", d3.select("#n" + e[0])._groups[0][0].__data__.y)
+             .attr("x2", d3.select("#n" + e[1])._groups[0][0].__data__.y)
+             .attr("y1", d3.select("#n" + e[0])._groups[0][0].__data__.x)
+             .attr("y2", d3.select("#n" + e[1])._groups[0][0].__data__.x);
    });
 }
 
