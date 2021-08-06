@@ -12,7 +12,6 @@ var div = d3.select("div")
             .attr("id", "chart");
 
 var svg = div.append("svg")
-             .style("font", "16px sans-serif")
              .attr("width", "100%")
              .attr("height", "80vh")
              .call(d3.zoom() 
@@ -21,10 +20,6 @@ var svg = div.append("svg")
              .append("g");
         
 var tree = d3.tree().nodeSize([dx, dy]);
-
-// inizialmente vuoto
-var gNode = svg.append("g")
-               .attr("cursor", "pointer");
 
 // inizialmente vuoto
 var gLink = svg.append("g")
@@ -39,6 +34,10 @@ var gReward = svg.append("g")
                  .attr("stroke", "#555")
                  .attr("stroke-opacity", 0.4)
                  .attr("stroke-width", 1.5);
+
+// inizialmente vuoto
+var gNode = svg.append("g")
+               .attr("cursor", "pointer");
 
 function updateDraw(root, linkReward) {
     var nodes = root.descendants();
@@ -135,8 +134,8 @@ function handleMouseOver(d, i) {
           .attr("x", -15)
           .attr("width", 640)
           .attr("height", 190)
-          .attr("stroke", "#000000")
-          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("fill", "white")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
         d3.select(this)
@@ -192,7 +191,7 @@ function handleMouseOver(d, i) {
           .append('text')
           .attr("y", 35)
           .attr("x", -10)
-          .text("blocco abortito")
+          .text("blocco uncle")
           .attr("text-anchor", "start")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
@@ -221,8 +220,7 @@ function updateDrawReward(lst) {
 
 function draw() {
     // rimozione di tutti gli elementi grafici nell'svg
-    d3.select("div")
-      .select("div")
+    d3.select("#chart")
       .select("svg")
       .select("g")
       .selectAll('g')
