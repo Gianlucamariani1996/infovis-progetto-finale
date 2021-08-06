@@ -2,10 +2,10 @@
  * Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
  */
 
-var dy = 200;
-var dx = 240;
-var width = 1200;
-var height = 400;
+var dy = 150;
+var dx = 100;
+var width = 1250;
+var height = 600;
 
 var div = d3.select("div")
             .append("div")
@@ -13,9 +13,8 @@ var div = d3.select("div")
 
 var svg = div.append("svg")
              .style("font", "16px sans-serif")
-             .attr("width", width)
+             .attr("width", "100%")
              .attr("height", height)
-             .attr("id", "svg")
              .call(d3.zoom() 
                      .scaleExtent([0.1, 1])  
                      .on("zoom", function () { svg.attr('transform', d3.event.transform); }))
@@ -48,8 +47,8 @@ function updateDraw(root, linkReward) {
     tree(root);
 
     root.descendants().forEach(function (node) { 
-        node.x = node.x + height / 2;
-        node.y = node.y + width / 6;
+        node.x = node.x + 300;
+        node.y = node.y + 100;
       });
 
     // clausola update per i nodi
