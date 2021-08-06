@@ -20,7 +20,7 @@ var svg = d3.select("div")
             .attr("id", "svg")
             .call(d3.zoom() 
                     .scaleExtent([-1, 10])  
-                    .on("zoom", function() { svg.attr('transform', d3.event.transform); }))
+                    .on("zoom", function () { svg.attr('transform', d3.event.transform); }))
             .append("g");
         
 var tree = d3.tree().nodeSize([dx, dy]);
@@ -64,8 +64,8 @@ function updateDraw(root) {
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
-                        .attr("id", function(d) { return "n" + d.data.name})
-                        .on("click", function(d) {
+                        .attr("id", function (d) { return "n" + d.data.name})
+                        .on("click", function (d) {
                             click(d, root);
                         })
                         .on("mouseover", handleMouseOver)
@@ -75,7 +75,7 @@ function updateDraw(root) {
     nodeEnter.append("rect")
              .attr("width", 30)
              .attr("height", 10)
-             .attr("fill", function(d) {
+             .attr("fill", function (d) {
                  if (d.children) 
                     return "#555";
                  else return "#999";
@@ -86,7 +86,7 @@ function updateDraw(root) {
              .attr("dy", "-0.5em")
              .attr("x", "65")
              .attr("text-anchor", "end")
-             .text(function(d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); })
+             .text(function (d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); })
              .clone(true).lower()
              .attr("stroke-linejoin", "round");
 
@@ -100,8 +100,8 @@ function updateDraw(root) {
     // clausola enter per i link
     link.enter()
         .append("path")
-        .attr("d", d3.linkHorizontal().x(function(d) { return d.y })
-                                      .y(function(d) { return d.x }))
+        .attr("d", d3.linkHorizontal().x(function (d) { return d.y })
+                                      .y(function (d) { return d.x }))
         .attr("stroke-opacity", 0.5);
 
     // clausola exit per i link
@@ -173,7 +173,7 @@ function handleMouseOver(d, i) {
           .append('text')
           .attr("dy", "8em")
           .attr("x", -10)
-          .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
+          .text("blocchi pagati: " + d.data.uncles.map(function (e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
