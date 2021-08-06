@@ -23,17 +23,18 @@ var svg = div.append("svg")
         
 var tree = d3.tree().nodeSize([dx, dy]);
 
-// inizialmente vuoti
+// inizialmente vuoto
 var gNode = svg.append("g")
                .attr("cursor", "pointer");
 
-// inizialmente vuoti
+// inizialmente vuoto
 var gLink = svg.append("g")
                .attr("fill", "none")
                .attr("stroke", "#555")
                .attr("stroke-opacity", 0.4)
                .attr("stroke-width", 1.5);
 
+// inizialmente vuoto
 var gReward = svg.append("g")
                  .attr("fill", "none")
                  .attr("stroke", "#555")
@@ -68,7 +69,6 @@ function updateDraw(root, linkReward) {
                         .on("mouseover", handleMouseOver)
                         .on("mouseout", handleMouseOut);
 
-    // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra
     nodeEnter.append("rect")
              .attr("width", 30)
              .attr("height", 10)
@@ -78,10 +78,9 @@ function updateDraw(root, linkReward) {
                  else return "red";
              });
 
-    // non si può appendere direttamente sopra, perché tutte queste cose vanno appese all'oggetto restituito sopra 
     nodeEnter.append("text")
-             .attr("dy", "-0.5em")
-             .attr("x", "65")
+             .attr("y", -5)
+             .attr("x", 60)
              .attr("text-anchor", "end")
              .text(function (d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); });
 
@@ -104,8 +103,6 @@ function updateDraw(root, linkReward) {
 }
 
 function click(d, root, linkReward) {
-    // prova a richiamare updateDraw con d invece che con root e vedi che succede, magari serve per capire il codice
-
     // questo è il caso in cui si clicca per chiudere i nodi
     if (d.children) {
         d._children = d.children;
@@ -145,7 +142,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "2em")
+          .attr("y", 35)
           .attr("x", -10)
           .text("hash: " + d.data.name)
           .attr("text-anchor", "start")
@@ -153,7 +150,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "4em")
+          .attr("y", 65)
           .attr("x", -10)
           .text("altezza/numero di blocco: " + d.data.height)
           .attr("text-anchor", "start")
@@ -161,7 +158,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "6em")
+          .attr("y", 95)
           .attr("x", -10)
           .text("numero di transazioni: " + d.data.trans_num)
           .attr("text-anchor", "start")
@@ -169,7 +166,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "8em")
+          .attr("y", 125)
           .attr("x", -10)
           .text("blocchi pagati: " + d.data.uncles.map(function (e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
@@ -177,7 +174,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "10em")
+          .attr("y", 155)
           .attr("x", -10)
           .text("limite di gas: " + d.data.gas_limit)
           .attr("text-anchor", "start")
@@ -185,7 +182,7 @@ function handleMouseOver(d, i) {
 
         d3.select(this)
           .append('text')
-          .attr("dy", "12em")
+          .attr("y", 185)
           .attr("x", -10)
           .text("gas usato: " + d.data.gas_used)
           .attr("text-anchor", "start")
@@ -194,7 +191,7 @@ function handleMouseOver(d, i) {
     else 
         d3.select(this)
           .append('text')
-          .attr("dy", "2em")
+          .attr("y", 35)
           .attr("x", -10)
           .text("blocco abortito")
           .attr("text-anchor", "start")
@@ -224,6 +221,7 @@ function updateDrawReward(lst) {
 }
 
 function draw() {
+    // rimozione di tutti gli elementi grafici nell'svg
     d3.select("div")
       .select("div")
       .select("svg")
@@ -235,16 +233,16 @@ function draw() {
     var blockNum = document.getElementById("blockNum").value;
     var treeHeight = document.getElementById("treeHeight").value;
 
-    // loader settings
+    // configurazioni dello spinner
     var opts = {
-        lines: 9, // The number of lines to draw
-        length: 9, // The length of each line
-        width: 5, // The line thickness
-        radius: 14, // The radius of the inner circle
-        color: '#000000', // #rgb or #rrggbb or array of colors
-        speed: 1.9, // Rounds per second
-        trail: 40, // Afterglow percentage
-        className: 'spinner', // The CSS class to assign to the spinner
+        lines: 9, //  numero di linee da disegnare
+        length: 9, // lunghezza di ogni linea
+        width: 5, // spessore di ogni linea
+        radius: 14, // raggio del cerchio dello spinner
+        color: '#000000', // colore
+        speed: 1.9, // giri al secondo
+        trail: 40, // Percentuale di postluminescenza
+        className: 'spinner', // classe CSS assegnata allo spinner
     };
   
     var target = document.getElementById('chart');
@@ -262,6 +260,7 @@ function draw() {
              // aggiornamento del disegno
              updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
+             
          }).catch(function(error) {
                  console.log(error);
             });
