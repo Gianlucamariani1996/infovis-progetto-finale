@@ -90,6 +90,39 @@ function updateDraw(root) {
              .clone(true).lower()
              .attr("stroke-linejoin", "round");
 
+    // var linkReward = nodeEnter.selectAll("line").data(function (d) { if (d.data.uncles != null) { console.log(d.data.uncles); return [[d.x, d.y, d.data.uncles]];} else return []; });
+
+    // linkReward.enter()
+    //           .append("line")
+    //           .attr("x1", function (d) {  console.log(d); return d[1]; })
+    //           .attr("x2", function (d) { if (!d3.select("#n" + d[2][0]).empty()) return d3.select("#n" + d[2][0])._groups[0][0].__data__.y; })
+    //           .attr("y1", function (d) { return d[0]; })
+    //           .attr("y2", function (d) { if (!d3.select("#n" + d[2][0]).empty()) return d3.select("#n" + d[2][0])._groups[0][0].__data__.x; })
+    //           .attr("fill", "none")
+    //           .attr("stroke", "#555")
+    //           .attr("stroke-opacity", 0.4)
+    //           .attr("stroke-width", 1.5)
+
+    // nodeEnter.append("line")
+    //           .attr("x1", function (d) { return d.y; })
+    //           .attr("x2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[0]).empty()) return d3.select("#n" + d.data.uncles[0])._groups[0][0].__data__.y; })
+    //           .attr("y1", function (d) { return d.x; })
+    //           .attr("y2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[0]).empty()) return d3.select("#n" + d.data.uncles[0])._groups[0][0].__data__.x; })
+    //           .attr("fill", "none")
+    //           .attr("stroke", "#555")
+    //           .attr("stroke-opacity", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[0]).empty()) return 1; else 0; })
+    //           .attr("stroke-width", 1.5)
+
+    // nodeEnter.append("line")
+    //         .attr("x1", function (d) { return d.y; })
+    //         .attr("x2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return d3.select("#n" + d.data.uncles[1])._groups[0][0].__data__.y; })
+    //         .attr("y1", function (d) { return d.x; })
+    //         .attr("y2", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return d3.select("#n" + d.data.uncles[1])._groups[0][0].__data__.x; })
+    //         .attr("stroke", "#555")
+    //         .attr("stroke-opacity", function (d) { if (d.data.uncles != null && !d3.select("#n" + d.data.uncles[1]).empty()) return 1; else 0; })
+    //         .attr("stroke-width", 1.5)
+
+
     // clausola exit per i nodi
     node.exit().remove();
 
@@ -230,6 +263,7 @@ function updateDrawReward(lst) {
         .attr("x2", d3.select("#n" + e[1])._groups[0][0].__data__.y)
         .attr("y1", d3.select("#n" + e[0])._groups[0][0].__data__.x)
         .attr("y2", d3.select("#n" + e[1])._groups[0][0].__data__.x)
+        .attr("id", "#l" + e[0])
         .attr("stroke-opacity", 0.5);
    });
 }
