@@ -52,7 +52,7 @@ function updateDraw(root, linkReward) {
 
     // clausola update per i nodi
     var node = gNode.selectAll("g")
-                    .data(nodes);
+                    .data(nodes, function(d){return d.data.name});
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
@@ -129,6 +129,7 @@ function handleMouseOver(d, i) {
     if (d.data.uncles != null) {
 
         d3.select(this)
+          .raise()
           .append("rect")
           .attr("y", 15)
           .attr("x", -15)
