@@ -16,7 +16,7 @@ var svg = div.append("svg")
              .attr("height", "80vh")
              .call(d3.zoom() 
                      .scaleExtent([0.1, 1])  
-                     .on("zoom", function () { svg.attr('transform', d3.event.transform); }))
+                     .on("zoom", function() { svg.attr('transform', d3.event.transform); }))
              .append("g");
         
 var tree = d3.tree().nodeSize([dx, dy]);
@@ -45,14 +45,15 @@ function updateDraw(root, linkReward) {
     // computazione del nuovo layout
     tree(root);
 
-    root.descendants().forEach(function (node) { 
+    root.descendants().forEach(function(node) { 
         node.x = node.x + 300;
         node.y = node.y + 100;
       });
 
     // clausola update per i nodi
+    // in questo modo il join dei dati non viene fatto sulla base dell'ordine
     var node = gNode.selectAll("g")
-                    .data(nodes, function(d){return d.data.name});
+                    .data(nodes, function(d) { return d.data.name });
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
@@ -60,8 +61,8 @@ function updateDraw(root, linkReward) {
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
-                        .attr("id", function (d) { return "n" + d.data.name})
-                        .on("click", function (d) {
+                        .attr("id", function(d) { return "n" + d.data.name})
+                        .on("click", function(d) {
                             click(d, root, linkReward);
                         })
                         .on("mouseover", handleMouseOver)
@@ -70,7 +71,7 @@ function updateDraw(root, linkReward) {
     nodeEnter.append("rect")
              .attr("width", 30)
              .attr("height", 10)
-             .attr("fill", function (d) {
+             .attr("fill", function(d) {
                  if (d.children || d._children || d.data.uncles != null) 
                     return "green";
                  else return "red";
@@ -80,7 +81,7 @@ function updateDraw(root, linkReward) {
              .attr("y", -5)
              .attr("x", 60)
              .attr("text-anchor", "end")
-             .text(function (d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); });
+             .text(function(d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); });
 
     // clausola exit per i nodi
     node.exit().remove();
@@ -92,8 +93,8 @@ function updateDraw(root, linkReward) {
     // clausola enter per i link
     link.enter()
         .append("path")
-        .attr("d", d3.linkHorizontal().x(function (d) { return d.y })
-                                      .y(function (d) { return d.x }));
+        .attr("d", d3.linkHorizontal().x(function(d) { return d.y })
+                                      .y(function(d) { return d.x }));
 
     // clausola exit per i link
     link.exit().remove();
@@ -128,6 +129,7 @@ function handleMouseOver(d, i) {
     // si controlla se si sta su un blocco della catena principale oppure si è su un blocco abortito
     if (d.data.uncles != null) {
 
+        // si mette raise perché si deve mettere l'elemento del gruppo g per ultimo, in questo modo quando si disegna, essendo l'ultimo ad essere disegnato, sovrascrive le cose che stanno sotto (ordine degli elementi si vedono immaginando l'asse Z uscente dallo schermo del PC)
         d3.select(this)
           .raise()
           .append("rect")
@@ -167,7 +169,7 @@ function handleMouseOver(d, i) {
           .append('text')
           .attr("y", 125)
           .attr("x", -10)
-          .text("blocchi pagati: " + d.data.uncles.map(function (e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
+          .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
           .attr('id', "t" + d.x + "-" + d.y + "-" + i);
 
@@ -208,7 +210,7 @@ function handleMouseOut(d, i) {
   }
 
 function updateDrawReward(lst) {
-  lst.forEach(function (e) {
+  lst.forEach(function(e) {
     // bisogna controllare se ci sono entrambi i nodi per prendere le coordinate, potrebbe essere che un nodo risulta che ha pagato un nodo che però non è presente nella visualizzazione perché si trova in una porzione della blockchain che non viene visualizzata
     if (!d3.select("#n" + e[0]).empty() && !d3.select("#n" + e[1]).empty())
       gReward.append("line")
