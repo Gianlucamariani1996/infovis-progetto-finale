@@ -57,7 +57,7 @@ function updateDraw(root, linkReward) {
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
-                        .append("g")
+                        .insert("g", ":first-child")
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
@@ -245,11 +245,13 @@ function updateDrawReward(lst) {
 function draw() {
     // rimozione di tutti gli elementi grafici nell'svg
     d3.select("#chart")
-      .select("svg")
-      .select("g")
+      .selectAll("svg")
+      .selectAll("g")
       .selectAll("g")
       .selectAll("*")
       .remove();
+
+    d3.selectAll("#gauge").remove();
 
     var blockNum = document.getElementById("blockNum").value;
     var treeHeight = document.getElementById("treeHeight").value;
@@ -279,8 +281,8 @@ function draw() {
              updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
 
-            var gaugeTransactions = new Gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
-            var gaugeUncles = new Gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
+            var gaugeTransactions = Gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
+            var gaugeUncles = Gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
 
             gaugeTransactions.update(data.data[0]);
             gaugeUncles.update(data.data[1]);
@@ -322,10 +324,11 @@ var Gauge = function(maxValue, textMaxValue, title) {
               .startAngle(deg2rad(-90));
 
   // Place svg element
-  var svg = d3.select("body")
-              .append("svg")
+  var svg = d3.select("#chart")
+              .insert("svg", ":first-child")
               .attr("width", config.size)
               .attr("height", config.size - 50)
+              .attr("id", "gauge")
               .append("g")
               .attr("transform", "translate(" + config.size / 2 + "," + (config.size / 2 + 25) + ")");
 
