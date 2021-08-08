@@ -3,46 +3,30 @@ body {
     margin: 0;
 }
 
-/* h1 {
-    text-align: center;
-} */
+.cont {
+    margin: 3px;
+}
+
+.header {
+	width: 100%;
+	height: 70px;
+  	background-color: rgba(0, 0, 0, 0.8);
+    display: table; 
+}
+
+.paragraph {
+	vertical-align: middle;
+    display: table-cell; 
+    padding-left: 5%;
+    color: white;
+}
 
 .form{
+    text-align: center;
     margin-top: 10px;
     margin-bottom: 10px;
-}
-.cont {
-    text-align: center;
 }
 
 svg { 
     border: 1px solid rgba(0, 0, 0, 0.8);
-}
-
-nav {
-    background-color: rgba(0, 0, 0, 0.8);
-    height: 70px;
-    margin: 0;
-}
-
-.menu-list {
-    /* Lista degli elementi dentro nav */
-    margin: 0;
-    margin-left: -8%;
-}
-
-#pulsanti-menu {
-    /* Elementi della lista: non devono avere puntatori, spaziatura interna di 20px e ogni elemento viene
-                                   trattato come blocco ma viene messo in linea */
-    list-style-type: none;
-    padding: 20px 0;
-    width: 25%;
-    height: 30px;
-    /* display: inline-block */
-}
-
-#text-menu {
-    /* link dentro ogni elemento della lista */
-    color: white;
-    text-decoration: none;
 }
