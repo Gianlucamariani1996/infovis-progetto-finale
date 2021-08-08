@@ -10,6 +10,9 @@ var dx = 100;
 var div = d3.select("div")
             .append("div")
             .attr("id", "chart");
+            
+var gaugeTransactions = gauge(0, "?", "Numero di transazioni");
+var gaugeUncles = gauge(0, "?", "Numero di blocchi abortiti");
 
 var svg = div.append("svg")
              .attr("width", "100%")
@@ -252,6 +255,9 @@ function draw() {
       .remove();
 
     d3.selectAll("#gauge").remove();
+    
+    gaugeTransactions = gauge(0, "?", "Numero di transazioni");
+    gaugeUncles = gauge(0, "?", "Numero di blocchi abortiti"); 
 
     var blockNum = document.getElementById("blockNum").value;
     var treeHeight = document.getElementById("treeHeight").value;
@@ -281,8 +287,12 @@ function draw() {
              updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
 
-            var gaugeTransactions = gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
-            var gaugeUncles = gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
+            d3.selectAll("#gauge").remove();
+
+            gaugeTransactions = gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
+            gaugeUncles = gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
+
+            console.log(gaugeTransactions)
 
             gaugeTransactions.update(data.data[0]);
             gaugeUncles.update(data.data[1]);
@@ -378,6 +388,6 @@ function gauge(maxValue, textMaxValue, title) {
   }
 
   that.update = update;
-  that.configuration = config;
+  that.config = config;
   return that;
 }
