@@ -281,8 +281,8 @@ function draw() {
              updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
 
-            var gaugeTransactions = Gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
-            var gaugeUncles = Gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
+            var gaugeTransactions = gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
+            var gaugeUncles = gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
 
             gaugeTransactions.update(data.data[0]);
             gaugeUncles.update(data.data[1]);
@@ -293,7 +293,7 @@ function draw() {
 
 }
 
-var Gauge = function(maxValue, textMaxValue, title) {
+function gauge(maxValue, textMaxValue, title) {
   var that = {};
 
   var config = {
