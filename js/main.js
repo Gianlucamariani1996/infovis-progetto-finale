@@ -138,7 +138,7 @@ function handleMouseOver(d) {
           .attr("width", 640)
           .attr("height", 190)
           .attr("stroke", "black")
-          .attr("fill", "white")
+          .attr("fill", "yellow")
           .attr("id", "hovering");
 
         d3.select(this)
@@ -189,7 +189,17 @@ function handleMouseOver(d) {
           .attr("text-anchor", "start")
           .attr("id", "hovering");
     }
-    else 
+    else {
+        d3.select(this)
+          .append("rect")
+          .attr("y", 15)
+          .attr("x", -15)
+          .attr("width", 100)
+          .attr("height", 30)
+          .attr("stroke", "black")
+          .attr("fill", "yellow")
+          .attr("id", "hovering");
+
         d3.select(this)
           .append("text")
           .attr("y", 35)
@@ -197,6 +207,7 @@ function handleMouseOver(d) {
           .text("blocco uncle")
           .attr("text-anchor", "start")
           .attr("id", "hovering");
+    }
 
 }
 
