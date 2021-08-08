@@ -14,6 +14,14 @@ var div = d3.select("div")
 var gaugeTransactions = gauge(0, "?", "Numero di transazioni");
 var gaugeUncles = gauge(0, "?", "Numero di blocchi abortiti");
 
+var gPie = d3.select("#chart")
+            .insert("svg", ":first-child")
+            .attr("width", 200)
+            .attr("height", 150)
+            .attr("id", "pie")
+            .append("g")
+            .attr("transform", "translate(" + 100 + "," + 90 + ")");
+
 var svg = div.append("svg")
              .attr("width", "100%")
              .attr("height", "80vh")
@@ -312,6 +320,8 @@ function draw() {
 
             gaugeTransactions.update(data.data[0]);
             gaugeUncles.update(data.data[1]);
+
+            updateDrawPie(data.data[4]);
             
          }).catch(function(error) {
                  console.log(error);
@@ -412,4 +422,40 @@ function gauge(maxValue, textMaxValue, title) {
   that.update = update;
   that.config = config;
   return that;
+}
+
+
+function updateDrawPie(data) {
+
+  var radius = 50
+
+  var color = d3.scaleOrdinal()
+                .domain(data)
+                .range(["red", "blue", "green", "orange", "grey"]);
+
+  // Compute the position of each group on the pie:
+  var pie = d3.pie()
+              .value(function(d) { return d.value; });
+
+  var data_ready = pie(d3.entries(data));
+
+  // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+  gPie.selectAll('whatever')
+     .data(data_ready)
+     .enter()
+     .append('path')
+     .attr('d', d3.arc()
+                  .innerRadius(0)
+                  .outerRadius(radius))
+     .attr('fill', function(d){ return(color(d.data.key)) })
+    //  .attr("stroke", "black")
+    //  .style("stroke-width", "2px")
+    //  .style("opacity", 0.7);
+
+  gPie.append("text")
+      .attr("transform", "translate(" + 0 + "," + (-65) + ")")
+      .attr("text-anchor", "middle")
+      .text("Minatori");
+
+
 }
