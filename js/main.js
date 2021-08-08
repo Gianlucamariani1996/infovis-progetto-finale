@@ -4,23 +4,32 @@
 
 var dy = 150;
 var dx = 100;
-// var width = 1250;
-// var height = 600;
 
 var div = d3.select("div")
             .append("div")
             .attr("id", "chart");
 
-var gaugeTransactions = gauge(0, "?", "Numero di transazioni");
-var gaugeUncles = gauge(0, "?", "Numero di blocchi abortiti");
+var gaugeTransactions = createDrawGauge("Numero di transazioni");
+var gaugeUncles = createDrawGauge("Numero di blocchi abortiti");
 
 var gPie = d3.select("#chart")
-            .insert("svg", ":first-child")
-            .attr("width", 200)
-            .attr("height", 150)
-            .attr("id", "pie")
-            .append("g")
-            .attr("transform", "translate(" + 100 + "," + 90 + ")");
+             .insert("svg", ":first-child")
+             .attr("width", 200)
+             .attr("height", 150)
+             .attr("id", "pie")
+             .append("g")
+             .attr("transform", "translate(" + 100 + "," + 90 + ")");
+
+gPie.append("text")
+    .attr("transform", "translate(" + 0 + "," + (-65) + ")")
+    .attr("text-anchor", "middle")
+    .text("Minatori");
+
+gPie.append("circle")
+    .attr('cx', 0)
+    .attr('cy', 0)
+    .attr('r', 50)
+    .style('fill', "#ddd");
 
 var svg = div.append("svg")
              .attr("width", "100%")
@@ -49,6 +58,21 @@ var gReward = svg.append("g")
 // inizialmente vuoto
 var gNode = svg.append("g")
                .attr("cursor", "pointer");
+
+// configurazioni dello spinner
+var spinnerOpts = {
+  lines: 9, //  numero di linee da disegnare
+  length: 9, // lunghezza di ogni linea
+  width: 5, // spessore di ogni linea
+  radius: 14, // raggio del cerchio dello spinner
+  color: "#000000", // colore
+  speed: 1.9, // giri al secondo
+  trail: 40, // Percentuale di postluminescenza
+  className: "spinner", // classe CSS assegnata allo spinner
+};
+
+var target = document.getElementById("chart");
+var spinner = new Spinner(spinnerOpts);
 
 function updateDraw(root, linkReward) {
     var nodes = root.descendants();
@@ -269,104 +293,16 @@ function updateDrawReward(lst) {
     });
 }
 
-function draw() {
-    // rimozione di tutti gli elementi grafici nell'svg
-    d3.select("#chart")
-      .selectAll("svg")
-      .selectAll("g")
-      .selectAll("g")
-      .selectAll("*")
-      .remove();
-
-    d3.selectAll("#gauge").remove();
-    
-    gaugeTransactions = gauge(0, "?", "Numero di transazioni");
-    gaugeUncles = gauge(0, "?", "Numero di blocchi abortiti"); 
-
-    var blockNum = document.getElementById("blockNum").value;
-    var treeHeight = document.getElementById("treeHeight").value;
-
-    // configurazioni dello spinner
-    var opts = {
-        lines: 9, //  numero di linee da disegnare
-        length: 9, // lunghezza di ogni linea
-        width: 5, // spessore di ogni linea
-        radius: 14, // raggio del cerchio dello spinner
-        color: "#000000", // colore
-        speed: 1.9, // giri al secondo
-        trail: 40, // Percentuale di postluminescenza
-        className: "spinner", // classe CSS assegnata allo spinner
-    };
-  
-    var target = document.getElementById("chart");
-    var spinner = new Spinner(opts).spin(target);
-    
-    axios.get("http://localhost:5000/generate-tree?block=" + blockNum + "&height=" + treeHeight)
-         .then(function(data) {
-             spinner.stop();
-
-             console.log(data.data[4]);
-
-             var root = d3.hierarchy(data.data[3]);
-
-             // aggiornamento del disegno
-             updateDraw(root, data.data[2]);
-             updateDrawReward(data.data[2]);
-
-            d3.selectAll("#gauge").remove();
-
-            gaugeTransactions = gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
-            gaugeUncles = gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
-
-            gaugeTransactions.update(data.data[0]);
-            gaugeUncles.update(data.data[1]);
-
-            updateDrawPie(data.data[4]);
-            
-         }).catch(function(error) {
-                 console.log(error);
-            });
-
-}
-
-function gauge(maxValue, textMaxValue, title) {
-  var that = {};
-
-  var config = {
-    size: 200,
-    arcInset: 150,
-    arcWidth: 60,
-
-    minValue: 0,
-    maxValue: maxValue,
-    
-    textMaxValue: textMaxValue,
-
-    title : title
-
-  };
-
-  var oR = config.size - config.arcInset;
-  var iR = config.size - oR - config.arcWidth;
-
-  function deg2rad(deg) {
-    return deg * Math.PI / 180
-  }
-
-  // Arc Defaults
-  var arc = d3.arc()
-              .innerRadius(iR)
-              .outerRadius(oR)
-              .startAngle(deg2rad(-90));
+function createDrawGauge(title) {
 
   // Place svg element
   var svg = d3.select("#chart")
               .insert("svg", ":first-child")
-              .attr("width", config.size)
-              .attr("height", config.size - 50)
-              .attr("id", "gauge")
+              .attr("width", 200)
+              .attr("height", 150)
+              .attr("id", title.replace(/\s/g, '_'))
               .append("g")
-              .attr("transform", "translate(" + config.size / 2 + "," + (config.size / 2 + 25) + ")");
+              .attr("transform", "translate(" + 100 + "," + 125 + ")");
 
   svg.append("text")
      .attr("transform", "translate(" + 0 + "," + (-100) + ")")
@@ -374,56 +310,86 @@ function gauge(maxValue, textMaxValue, title) {
      .text(title);
 
   // Append background arc to svg
-  var background = svg.append("path")
-                      .datum({ endAngle: deg2rad(90) })
-                      .attr("d", arc)
-                      .attr("fill", "#ddd");
+  svg.append("path")
+     .datum({ endAngle: 90 * Math.PI / 180 })
+     .attr("d", d3.arc()
+                  .innerRadius(90)
+                  .outerRadius(50)
+                  .startAngle(-90 * Math.PI / 180))
+     .attr("fill", "#ddd");
 
   // Append foreground arc to svg
-  var foreground = svg.append("path")
-                      .datum({ endAngle: deg2rad(-90) })
-                      .attr("d", arc);
+  svg.append("path")
+     .attr("id", "foreground")
+     .datum({ endAngle: -90 * Math.PI / 180 })
+     .attr("d", d3.arc()
+                  .innerRadius(90)
+                  .outerRadius(50)
+                  .startAngle(-90 * Math.PI / 180));
 
   // Display Max value
-  var max = svg.append("text")
-               .attr("transform", "translate(" + (iR + ((oR - iR) / 2)) + ",15)") // Set between inner and outer Radius
-               .attr("text-anchor", "middle")
-               .text(textMaxValue);
+  svg.append("text")
+     .attr("transform", "translate(" + 70 + ",15)") // Set between inner and outer Radius
+     .attr("text-anchor", "middle")
+     .attr("id", "max")
+     .text("?");
 
   // Display Min value
-  var min = svg.append("text")
-               .attr("transform", "translate(" + -(iR + ((oR - iR) / 2)) + ",15)") // Set between inner and outer Radius
-               .attr("text-anchor", "middle")
-               .text(config.minValue);
+  svg.append("text")
+     .attr("transform", "translate(" + (- 70) + ",15)") // Set between inner and outer Radius
+     .attr("text-anchor", "middle")
+     .attr("id", "min")
+     .text(0);
 
   // Display Current value  
-  var current = svg.append("text")
-                   .attr("transform", "translate(0," + -(- 20 + iR / 4) + ")") // Push up from center 1/4 of innerRadius
-                   .attr("text-anchor", "middle");
+  svg.append("text")
+     .attr("transform", "translate(0," + (- 2,5) + ")") // Push up from center 1/4 of innerRadius
+     .attr("text-anchor", "middle")
+     .attr("id", "current");
 
-  function update(value) {
-    
-    var numPi;
+}
 
-    if (value > config.maxValue) 
-      numPi = deg2rad(Math.floor(config.maxValue * 180 / config.maxValue - 90));
-    else
-      numPi = deg2rad(Math.floor(value * 180 / config.maxValue - 90));
+function updateDrawGauge(title, maxValueLabel, maxValue, value) {
 
+  var max = d3.select("#" + title.replace(/\s/g, '_'))
+              .select("#max");
+
+  var current = d3.select("#" + title.replace(/\s/g, '_'))
+                  .select("#current");
+
+  var foreground = d3.select("#" + title.replace(/\s/g, '_'))
+                     .select("#foreground");
+
+  if (maxValueLabel == "?") {
+    max.text(maxValueLabel);
+    current.text("")
+    foreground.datum({ endAngle: -90 * Math.PI / 180 })
+              .attr("d", d3.arc()
+                           .innerRadius(90)
+                           .outerRadius(50)
+                           .startAngle(-90 * Math.PI / 180));
+  }
+  else {
+    max.text(maxValueLabel);
     // Display Current value
     current.text(value);
 
-    // Arc Transition
-    foreground.style("fill", "orange")
-              .attr("d", arc({ endAngle: numPi }));
+    var numPi;
 
+    if (value > maxValue) 
+      numPi = Math.floor(value * 180 / maxValue - 90) * Math.PI / 180;
+    else 
+      numPi = Math.floor(value * 180 / maxValue - 90) * Math.PI / 180;
+
+    foreground.style("fill", "orange")
+              .datum({ endAngle: numPi })
+              .attr("d", d3.arc()
+                           .innerRadius(90)
+                           .outerRadius(50)
+                           .startAngle(-90 * Math.PI / 180));
   }
 
-  that.update = update;
-  that.config = config;
-  return that;
 }
-
 
 function updateDrawPie(data) {
 
@@ -440,22 +406,54 @@ function updateDrawPie(data) {
   var data_ready = pie(d3.entries(data));
 
   // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-  gPie.selectAll('whatever')
-     .data(data_ready)
-     .enter()
+  var pie = gPie.selectAll('path')
+                .data(data_ready);
+  pie.enter()
      .append('path')
      .attr('d', d3.arc()
                   .innerRadius(0)
                   .outerRadius(radius))
-     .attr('fill', function(d){ return(color(d.data.key)) })
-    //  .attr("stroke", "black")
-    //  .style("stroke-width", "2px")
-    //  .style("opacity", 0.7);
+     .attr('fill', function(d){ return(color(d.data.key)) });
 
-  gPie.append("text")
-      .attr("transform", "translate(" + 0 + "," + (-65) + ")")
-      .attr("text-anchor", "middle")
-      .text("Minatori");
+  pie.exit().remove();
 
+}
+
+function draw() {
+    // rimozione di tutti gli elementi grafici nell'svg
+    d3.select("#chart")
+      .selectAll("svg")
+      .selectAll("g")
+      .selectAll("g")
+      .selectAll("*")
+      .remove();
+
+    updateDrawGauge("Numero di transazioni", "?", 0, 0);
+    updateDrawGauge("Numero di blocchi abortiti", "?", 0, 0);
+    updateDrawPie({})
+
+    var blockNum = document.getElementById("blockNum").value;
+    var treeHeight = document.getElementById("treeHeight").value;
+
+    spinner.spin(target);
+    
+    axios.get("http://localhost:5000/generate-tree?block=" + blockNum + "&height=" + treeHeight)
+         .then(function(data) {
+             spinner.stop();
+
+             var root = d3.hierarchy(data.data[3]);
+
+             // aggiornamento del disegno
+             updateDraw(root, data.data[2]);
+             updateDrawReward(data.data[2]);
+
+             updateDrawGauge("Numero di transazioni", treeHeight * 500 / 1000 + "K", treeHeight * 500, data.data[0]);
+             updateDrawGauge("Numero di blocchi abortiti", treeHeight * 2, treeHeight * 2, data.data[1]);
+
+             updateDrawPie(data.data[4]);
+            
+         }).catch(function(error) {
+                 console.log(error);
+            });
 
 }
