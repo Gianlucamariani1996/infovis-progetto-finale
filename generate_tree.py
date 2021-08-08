@@ -26,6 +26,7 @@ else:
 
 def generate_tree(block_num, height):
     blocks_to_append = {}
+    # si usa la lista per il passaggio per valore/riferimento
     total_trans_uncles_number = [0, 0]
     links_uncle_reward = []
     if block_num >= 7:
@@ -33,7 +34,7 @@ def generate_tree(block_num, height):
     else:
         generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward)
 
-    append_blocks(generated_tree, blocks_to_append)
+    append_blocks(generated_tree, blocks_to_append, total_trans_uncles_number)
 
     string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], links_uncle_reward, generated_tree])
     return string_of_trans_uncles_tree
@@ -51,7 +52,6 @@ def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_u
     gas_used = block['gasUsed']
 
     total_trans_uncles_number[0] += trans_num
-    total_trans_uncles_number[1] += uncles_number
     tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used)
 
     if height == 0:
@@ -74,13 +74,14 @@ def generate_blocks_to_append(root, root_hash, uncles_number, height_root, block
             else:
                 blocks_to_append[uncle["parentHash"]] = blocks_to_append[uncle["parentHash"]] + [Tree(uncle["hash"])]
 
-def append_blocks(tree, blocks_to_append):
+def append_blocks(tree, blocks_to_append, total_trans_uncles_number):
     for key in blocks_to_append:
         if key == tree.name:
             for e in blocks_to_append[key]:
+                total_trans_uncles_number[1] += 1
                 tree.children.append(e)            
     for child in tree.children:
-        append_blocks(child, blocks_to_append)
+        append_blocks(child, blocks_to_append, total_trans_uncles_number)
 
 api = Flask(__name__)
 CORS(api)

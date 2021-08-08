@@ -16,7 +16,7 @@ var svg = div.append("svg")
              .attr("height", "80vh")
              .call(d3.zoom() 
                      .scaleExtent([0.1, 1])  
-                     .on("zoom", function() { svg.attr('transform', d3.event.transform); }))
+                     .on("zoom", function() { svg.attr("transform", d3.event.transform); }))
              .append("g");
         
 var tree = d3.tree().nodeSize([dx, dy]);
@@ -106,7 +106,7 @@ function click(d, root, linkReward) {
     if (d.children) {
         d._children = d.children;
         d.children = null;
-        d3.selectAll("line").remove();
+        d3.selectAll("#reward").remove();
         updateDraw(root, linkReward);
         updateDrawReward(linkReward);
     } 
@@ -114,24 +114,24 @@ function click(d, root, linkReward) {
     else if (d._children) {
         d.children = d._children;
         d._children = null;
-        d3.selectAll("line").remove();
+        d3.selectAll("#reward").remove();
         updateDraw(root, linkReward);
         updateDrawReward(linkReward);
     }
 
 }
 
-function handleMouseOver(d, i) {
+function handleMouseOver(d) {
+    // si mette raise perché si deve mettere l'elemento del gruppo g per ultimo, in questo modo quando si disegna, essendo l'ultimo ad essere disegnato, sovrascrive le cose che stanno sotto (ordine degli elementi si vedono immaginando l'asse Z uscente dallo schermo del PC)
     d3.select(this)
+      .raise()
       .select("text")
       .attr("fill", "red");
 
     // si controlla se si sta su un blocco della catena principale oppure si è su un blocco abortito
     if (d.data.uncles != null) {
-
-        // si mette raise perché si deve mettere l'elemento del gruppo g per ultimo, in questo modo quando si disegna, essendo l'ultimo ad essere disegnato, sovrascrive le cose che stanno sotto (ordine degli elementi si vedono immaginando l'asse Z uscente dallo schermo del PC)
+        
         d3.select(this)
-          .raise()
           .append("rect")
           .attr("y", 15)
           .attr("x", -15)
@@ -139,86 +139,96 @@ function handleMouseOver(d, i) {
           .attr("height", 190)
           .attr("stroke", "black")
           .attr("fill", "white")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 35)
           .attr("x", -10)
           .text("hash: " + d.data.name)
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 65)
           .attr("x", -10)
           .text("altezza/numero di blocco: " + d.data.height)
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i); 
+          .attr("id", "hovering"); 
 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 95)
           .attr("x", -10)
           .text("numero di transazioni: " + d.data.trans_num)
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 125)
           .attr("x", -10)
           .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 155)
           .attr("x", -10)
           .text("limite di gas: " + d.data.gas_limit)
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 185)
           .attr("x", -10)
           .text("gas usato: " + d.data.gas_used)
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
     }
     else 
         d3.select(this)
-          .append('text')
+          .append("text")
           .attr("y", 35)
           .attr("x", -10)
           .text("blocco uncle")
           .attr("text-anchor", "start")
-          .attr('id', "t" + d.x + "-" + d.y + "-" + i);
+          .attr("id", "hovering");
 
 }
 
-function handleMouseOut(d, i) {
+function handleMouseOut() {
     d3.select(this)
       .select("text")
       .attr("fill", "black");
 
-    d3.selectAll("#t" + d.x + "-" + d.y + "-" + i).remove();
+    d3.selectAll("#hovering").remove();
     
   }
 
 function updateDrawReward(lst) {
-  lst.forEach(function(e) {
-    // bisogna controllare se ci sono entrambi i nodi per prendere le coordinate, potrebbe essere che un nodo risulta che ha pagato un nodo che però non è presente nella visualizzazione perché si trova in una porzione della blockchain che non viene visualizzata
-    if (!d3.select("#n" + e[0]).empty() && !d3.select("#n" + e[1]).empty())
-      gReward.append("line")
-             .attr("x1", d3.select("#n" + e[0])._groups[0][0].__data__.y)
-             .attr("x2", d3.select("#n" + e[1])._groups[0][0].__data__.y)
-             .attr("y1", d3.select("#n" + e[0])._groups[0][0].__data__.x)
-             .attr("y2", d3.select("#n" + e[1])._groups[0][0].__data__.x);
-   });
+    lst.forEach(function (e) {
+      // bisogna controllare se ci sono entrambi i nodi per prendere le coordinate, potrebbe essere che un nodo risulta che ha pagato un nodo che però non è presente nella visualizzazione perché si trova in una porzione della blockchain che non viene visualizzata
+      if (!d3.select("#n" + e[0]).empty() && !d3.select("#n" + e[1]).empty()) {
+        x1 = d3.select("#n" + e[0])._groups[0][0].__data__.y + 15;
+        y1 = d3.select("#n" + e[0])._groups[0][0].__data__.x; 
+        x2 = d3.select("#n" + e[1])._groups[0][0].__data__.y + 30;
+        y2 = d3.select("#n" + e[1])._groups[0][0].__data__.x; 
+        gReward.append("path")
+                .attr("d", "M " + x1 + ","+ y1 + "Q" + x1 + "," + y2 + " " + x2 + ","+ y2)
+                .attr("stroke-dasharray", "10,10")
+                .attr("stroke", "red")
+                .attr("id", "reward");
+        gReward.append("path")
+               .attr("d", "M " + x2 + ","+ y2 + "L" + (x2 + 15) + "," + (y2 - 8) + " L" + (x2 + 15) + ","+ (y2 + 8) + "Z")
+               .attr("fill", "red")
+               .attr("stroke", "none")
+               .attr("id", "reward");
+      }
+    });
 }
 
 function draw() {
@@ -226,7 +236,7 @@ function draw() {
     d3.select("#chart")
       .select("svg")
       .select("g")
-      .selectAll('g')
+      .selectAll("g")
       .selectAll("*")
       .remove();
 
@@ -239,13 +249,13 @@ function draw() {
         length: 9, // lunghezza di ogni linea
         width: 5, // spessore di ogni linea
         radius: 14, // raggio del cerchio dello spinner
-        color: '#000000', // colore
+        color: "#000000", // colore
         speed: 1.9, // giri al secondo
         trail: 40, // Percentuale di postluminescenza
-        className: 'spinner', // classe CSS assegnata allo spinner
+        className: "spinner", // classe CSS assegnata allo spinner
     };
   
-    var target = document.getElementById('chart');
+    var target = document.getElementById("chart");
     var spinner = new Spinner(opts).spin(target);
     
     axios.get("http://localhost:5000/generate-tree?block=" + blockNum + "&height=" + treeHeight)
@@ -254,15 +264,106 @@ function draw() {
 
              var root = d3.hierarchy(data.data[3]);
 
-            //  console.log(data.data[0])
-            //  console.log(data.data[1])
-
              // aggiornamento del disegno
              updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
-             
+
+            var gaugeTransactions = new Gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
+            var gaugeUncles = new Gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
+
+            gaugeTransactions.update(data.data[0]);
+            gaugeUncles.update(data.data[1]);
+            
          }).catch(function(error) {
                  console.log(error);
             });
 
+}
+
+var Gauge = function(maxValue, textMaxValue, title) {
+  var that = {};
+
+  var config = {
+    size: 200,
+    arcInset: 150,
+    arcWidth: 60,
+
+    minValue: 0,
+    maxValue: maxValue,
+    
+    textMaxValue: textMaxValue,
+
+    title : title
+
+  };
+
+  var oR = config.size - config.arcInset;
+  var iR = config.size - oR - config.arcWidth;
+
+  function deg2rad(deg) {
+    return deg * Math.PI / 180
+  }
+
+  // Arc Defaults
+  var arc = d3.arc()
+              .innerRadius(iR)
+              .outerRadius(oR)
+              .startAngle(deg2rad(-90));
+
+  // Place svg element
+  var svg = d3.select("body")
+              .append("svg")
+              .attr("width", config.size)
+              .attr("height", config.size - 50)
+              .append("g")
+              .attr("transform", "translate(" + config.size / 2 + "," + (config.size / 2 + 25) + ")");
+
+  svg.append("text")
+     .attr("transform", "translate(" + 0 + "," + (-100) + ")")
+     .attr("text-anchor", "middle")
+     .text(title);
+
+  // Append background arc to svg
+  var background = svg.append("path")
+                      .datum({ endAngle: deg2rad(90) })
+                      .attr("d", arc)
+                      .attr("fill", "#ddd");
+
+  // Append foreground arc to svg
+  var foreground = svg.append("path")
+                      .datum({ endAngle: deg2rad(-90) })
+                      .attr("d", arc);
+
+  // Display Max value
+  var max = svg.append("text")
+               .attr("transform", "translate(" + (iR + ((oR - iR) / 2)) + ",15)") // Set between inner and outer Radius
+               .attr("text-anchor", "middle")
+               .text(textMaxValue);
+
+  // Display Min value
+  var min = svg.append("text")
+               .attr("transform", "translate(" + -(iR + ((oR - iR) / 2)) + ",15)") // Set between inner and outer Radius
+               .attr("text-anchor", "middle")
+               .text(config.minValue);
+
+  // Display Current value  
+  var current = svg.append("text")
+                   .attr("transform", "translate(0," + -(- 20 + iR / 4) + ")") // Push up from center 1/4 of innerRadius
+                   .attr("text-anchor", "middle");
+
+  function update(value) {
+    var numPi = deg2rad(Math.floor(value * 180 / config.maxValue - 90));
+
+    // Display Current value
+    current.text(value);
+
+    // Arc Transition
+    foreground.style("fill", "orange")
+              .attr("d", arc({ endAngle: numPi }));
+
+  }
+
+  that.update = update;
+  that.configuration = config;
+  return that;
 }
