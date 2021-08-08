@@ -10,7 +10,7 @@ var dx = 100;
 var div = d3.select("div")
             .append("div")
             .attr("id", "chart");
-            
+
 var gaugeTransactions = gauge(0, "?", "Numero di transazioni");
 var gaugeUncles = gauge(0, "?", "Numero di blocchi abortiti");
 
@@ -56,7 +56,7 @@ function updateDraw(root, linkReward) {
     // clausola update per i nodi
     // in questo modo il join dei dati non viene fatto sulla base dell'ordine
     var node = gNode.selectAll("g")
-                    .data(nodes, function(d) { return d.data.name });
+                    .data(nodes, function(d) { return d.data.hash });
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
@@ -64,7 +64,7 @@ function updateDraw(root, linkReward) {
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
-                        .attr("id", function(d) { return "n" + d.data.name})
+                        .attr("id", function(d) { return "n" + d.data.hash})
                         .on("click", function(d) {
                             click(d, root, linkReward);
                         })
@@ -84,7 +84,7 @@ function updateDraw(root, linkReward) {
              .attr("y", -5)
              .attr("x", 60)
              .attr("text-anchor", "end")
-             .text(function(d) { return d.data.name.slice(0, 3) + "..." + d.data.name.slice(63, 66); });
+             .text(function(d) { return d.data.hash.slice(0, 3) + "..." + d.data.hash.slice(63, 66); });
 
     // clausola exit per i nodi
     node.exit().remove();
@@ -139,7 +139,7 @@ function handleMouseOver(d) {
           .attr("y", 15)
           .attr("x", -15)
           .attr("width", 640)
-          .attr("height", 190)
+          .attr("height", 240)
           .attr("stroke", "black")
           .attr("fill", "yellow")
           .attr("id", "hovering");
@@ -148,7 +148,7 @@ function handleMouseOver(d) {
           .append("text")
           .attr("y", 35)
           .attr("x", -10)
-          .text("hash: " + d.data.name)
+          .text("hash: " + d.data.hash)
           .attr("text-anchor", "start")
           .attr("id", "hovering");
 
@@ -189,6 +189,22 @@ function handleMouseOver(d) {
           .attr("y", 185)
           .attr("x", -10)
           .text("gas usato: " + d.data.gas_used)
+          .attr("text-anchor", "start")
+          .attr("id", "hovering");
+
+        d3.select(this)
+          .append("text")
+          .attr("y", 215)
+          .attr("x", -10)
+          .text("minato da: " + d.data.miner)
+          .attr("text-anchor", "start")
+          .attr("id", "hovering");
+
+        d3.select(this)
+          .append("text")
+          .attr("y", 245)
+          .attr("x", -10)
+          .text("nonce: " + d.data.nonce)
           .attr("text-anchor", "start")
           .attr("id", "hovering");
     }
@@ -292,8 +308,6 @@ function draw() {
             gaugeTransactions = gauge(treeHeight * 500, treeHeight * 500 / 1000 + "K", "Numero di transazioni");
             gaugeUncles = gauge(treeHeight * 2, treeHeight * 2, "Numero di blocchi abortiti");
 
-            console.log(gaugeTransactions)
-
             gaugeTransactions.update(data.data[0]);
             gaugeUncles.update(data.data[1]);
             
@@ -376,7 +390,13 @@ function gauge(maxValue, textMaxValue, title) {
                    .attr("text-anchor", "middle");
 
   function update(value) {
-    var numPi = deg2rad(Math.floor(value * 180 / config.maxValue - 90));
+    
+    var numPi;
+
+    if (value > config.maxValue) 
+      numPi = deg2rad(Math.floor(config.maxValue * 180 / config.maxValue - 90));
+    else
+      numPi = deg2rad(Math.floor(value * 180 / config.maxValue - 90));
 
     // Display Current value
     current.text(value);

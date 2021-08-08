@@ -4,15 +4,17 @@ from flask import Flask, json, request
 from flask_cors import CORS
 
 class Tree(dict):
-    def __init__(self, name, height=None, trans_num=None, uncles=None, gas_limit=None, gas_used=None, children=None):
+    def __init__(self, hash, height=None, trans_num=None, uncles=None, gas_limit=None, gas_used=None, miner=None, nonce=None,children=None):
         super().__init__()
         self.__dict__ = self
-        self.name = name
+        self.hash = hash
         self.height = height
         self.trans_num = trans_num
         self.uncles = uncles
         self.gas_limit = gas_limit
         self.gas_used = gas_used
+        self.miner = miner
+        self.nonce = nonce
         if children is not None:
             self.children = children
         else:
@@ -50,9 +52,11 @@ def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_u
         uncles.append(web3.eth.get_uncle_by_block(root, i)['hash'])
     gas_limit = block['gasLimit']
     gas_used = block['gasUsed']
+    miner = block['miner']
+    nonce = block['nonce'].hex()
 
     total_trans_uncles_number[0] += trans_num
-    tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used)
+    tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used, miner, nonce)
 
     if height == 0:
         generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
@@ -76,7 +80,7 @@ def generate_blocks_to_append(root, root_hash, uncles_number, height_root, block
 
 def append_blocks(tree, blocks_to_append, total_trans_uncles_number):
     for key in blocks_to_append:
-        if key == tree.name:
+        if key == tree.hash:
             for e in blocks_to_append[key]:
                 total_trans_uncles_number[1] += 1
                 tree.children.append(e)            
