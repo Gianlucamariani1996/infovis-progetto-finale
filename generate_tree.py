@@ -31,17 +31,19 @@ def generate_tree(block_num, height):
     # si usa la lista per il passaggio per valore/riferimento
     total_trans_uncles_number = [0, 0]
     links_uncle_reward = []
+    famous_miner = {}
+
     if block_num >= 7:
-        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward)
+        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
     else:
-        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward)
+        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
 
     append_blocks(generated_tree, blocks_to_append, total_trans_uncles_number)
 
-    string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], links_uncle_reward, generated_tree])
+    string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], links_uncle_reward, generated_tree, famous_miner])
     return string_of_trans_uncles_tree
 
-def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward):
+def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner):
     block = web3.eth.getBlock(root)
     root_hash = block["hash"].hex()
     uncles_number = web3.eth.get_uncle_count(root)
@@ -55,13 +57,18 @@ def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_u
     miner = block['miner']
     nonce = block['nonce'].hex()
 
+    if miner not in famous_miner:
+        famous_miner[miner] = 1
+    else:
+        famous_miner[miner] += 1
+
     total_trans_uncles_number[0] += trans_num
     tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used, miner, nonce)
 
     if height == 0:
         generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
     else: 
-        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward))
+        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner))
         generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
         
     return tree

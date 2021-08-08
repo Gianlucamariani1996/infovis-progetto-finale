@@ -297,6 +297,8 @@ function draw() {
          .then(function(data) {
              spinner.stop();
 
+             console.log(data.data[4]);
+
              var root = d3.hierarchy(data.data[3]);
 
              // aggiornamento del disegno
