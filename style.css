@@ -4,7 +4,7 @@ body {
 }
 
 .cont {
-    margin: 3px;
+    margin: 0px;
 }
 
 .header {
@@ -35,7 +35,7 @@ input[type=text] {
 }
 
 input[type=button] {
-  width: 5%;
+  width: 8%;
   background-color: #4CAF50;
   color: white;
   padding-top: 14px;
@@ -55,10 +55,9 @@ input[type=button]:hover {
 
 .form {
     text-align: center;
-	width: 100%;
+	  width: 100%;
   	/* border-radius: 5px; */
   	/* background-color: #f2f2f2; */
-  	padding: 20px;
     border: 1px solid rgba(0, 0, 0, 0.8);
 
 }

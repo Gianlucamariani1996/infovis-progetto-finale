@@ -2,33 +2,57 @@
  * Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
  */
 
-var dy = 150;
-var dx = 100;
+ var gaugeConfig = {
+  minValue: 0,
+  maxValue: "?",
+
+  currentLabelInset: 20,
+
+  oR: 50,
+  iR: 90
+}
+
+function deg2rad(deg) {
+  return deg * Math.PI / 180
+}
 
 var gaugeTransactions = createDrawGauge("Numero di transazioni");
 var gaugeUncles = createDrawGauge("Numero di blocchi abortiti");
 
-var gPie = d3.select("div")
+var pieConf = {
+  radius: 50
+}
+
+var pieSVG = d3.select("div")
              .append("div")
              .attr("class", "pie")
              .append("svg")
              .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
-             .attr("height", "100%")
-             .append("g")
-             .attr("transform", "translate(" + 100 + "," + 85 + ")");
+             .attr("height", "100%");
+
+width = parseInt(pieSVG.style("width")) / 2
+height = parseInt(pieSVG.style("height"))
+
+var gPie = pieSVG.append("g")
+                  .attr("transform", "translate(" + width + "," + height * 3 / 5 + ")");
 
 gPie.append("text")
-    .attr("transform", "translate(" + 0 + "," + (-60) + ")")
+    .attr("transform", "translate(" + 0 + "," + - (height * 2 / 5) + ")")
     .attr("text-anchor", "middle")
     .text("Minatori");
 
 gPie.append("circle")
     .attr('cx', 0)
     .attr('cy', 0)
-    .attr('r', 50)
+    .attr('r', pieConf.radius)
     .style('fill', "#ddd");
 
-var svg = d3.select("div")
+var treeConf = {
+  dy: 150,
+  dx: 100
+}
+
+var treeSVG = d3.select("div")
             .append("div")
             .attr("id", "chart")
             .append("svg")
@@ -36,31 +60,33 @@ var svg = d3.select("div")
             .attr("height", "100%")
             .call(d3.zoom() 
                     .scaleExtent([0.1, 1])  
-                    .on("zoom", function() { svg.attr("transform", d3.event.transform); }))
+                    .on("zoom", function() { treeSVG.attr("transform", d3.event.transform); })
+                    )
+            .on("dblclick.zoom", null)
             .append("g");
         
-var tree = d3.tree().nodeSize([dx, dy]);
+var tree = d3.tree().nodeSize([treeConf.dx, treeConf.dy]);
 
 // inizialmente vuoto
-var gLink = svg.append("g")
-               .attr("fill", "none")
-               .attr("stroke", "#555")
-               .attr("stroke-opacity", 0.4)
-               .attr("stroke-width", 1.5);
+var gLink = treeSVG.append("g")
+                   .attr("fill", "none")
+                   .attr("stroke", "#555")
+                   .attr("stroke-opacity", 0.4)
+                   .attr("stroke-width", 1.5);
 
 // inizialmente vuoto
-var gReward = svg.append("g")
-                 .attr("fill", "none")
-                 .attr("stroke", "#555")
-                 .attr("stroke-opacity", 0.4)
-                 .attr("stroke-width", 1.5);
+var gReward = treeSVG.append("g")
+                     .attr("fill", "none")
+                     .attr("stroke", "#555")
+                     .attr("stroke-opacity", 0.4)
+                     .attr("stroke-width", 1.5);
 
 // inizialmente vuoto
-var gNode = svg.append("g")
-               .attr("cursor", "pointer");
+var gNode = treeSVG.append("g")
+                   .attr("cursor", "pointer");
 
 // configurazioni dello spinner
-var spinnerOpts = {
+var spinnerConf = {
   lines: 9, //  numero di linee da disegnare
   length: 9, // lunghezza di ogni linea
   width: 5, // spessore di ogni linea
@@ -72,9 +98,9 @@ var spinnerOpts = {
 };
 
 var target = document.getElementById("chart");
-var spinner = new Spinner(spinnerOpts);
+var spinner = new Spinner(spinnerConf);
 
-function updateDraw(root, linkReward) {
+function updateDrawTree(root, linkReward) {
     var nodes = root.descendants();
     var links = root.links();
     // computazione del nuovo layout
@@ -142,7 +168,7 @@ function click(d, root, linkReward) {
         d._children = d.children;
         d.children = null;
         d3.selectAll("#reward").remove();
-        updateDraw(root, linkReward);
+        updateDrawTree(root, linkReward);
         updateDrawReward(linkReward);
     } 
     // questo è il caso in cui si clicca per aprire i nodi
@@ -150,7 +176,7 @@ function click(d, root, linkReward) {
         d.children = d._children;
         d._children = null;
         d3.selectAll("#reward").remove();
-        updateDraw(root, linkReward);
+        updateDrawTree(root, linkReward);
         updateDrawReward(linkReward);
     }
 
@@ -302,50 +328,53 @@ function createDrawGauge(title) {
               .append("svg")
               .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
               .attr("height", "100%")
-              .attr("id", title.replace(/\s/g, '_'))
-              .append("g")
-              .attr("transform", "translate(" + 100 + "," + 125 + ")");
+              .attr("id", title.replace(/\s/g, '_'));
+
+  var width = parseInt(svg.style("width"));
+  var height = parseInt(svg.style("height"));
+  
+  var svg = svg.append("g")
+               .attr("transform", "translate(" + width / 2 + "," + height * 7 / 8 + ")");
 
   svg.append("text")
-     .attr("transform", "translate(" + 0 + "," + (-100) + ")")
+     .attr("transform", "translate(" + 0 + "," + - (height * 2 / 3) + ")")
      .attr("text-anchor", "middle")
      .text(title);
+     
+  var arc = d3.arc()
+              .innerRadius(gaugeConfig.iR)
+              .outerRadius(gaugeConfig.oR)
+              .startAngle(deg2rad(-90));
 
   // Append background arc to svg
   svg.append("path")
-     .datum({ endAngle: 90 * Math.PI / 180 })
-     .attr("d", d3.arc()
-                  .innerRadius(90)
-                  .outerRadius(50)
-                  .startAngle(-90 * Math.PI / 180))
+     .datum({ endAngle: deg2rad(90) })
+     .attr("d", arc)
      .attr("fill", "#ddd");
 
   // Append foreground arc to svg
   svg.append("path")
      .attr("id", "foreground")
-     .datum({ endAngle: -90 * Math.PI / 180 })
-     .attr("d", d3.arc()
-                  .innerRadius(90)
-                  .outerRadius(50)
-                  .startAngle(-90 * Math.PI / 180));
+     .datum({ endAngle: deg2rad(-90) })
+     .attr("d", arc);
 
   // Display Max value
   svg.append("text")
-     .attr("transform", "translate(" + 70 + ",15)") // Set between inner and outer Radius
+     .attr("transform", "translate(" + (gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",15)") // Set between inner and outer Radius
      .attr("text-anchor", "middle")
      .attr("id", "max")
-     .text("?");
+     .text(gaugeConfig.maxValue);
 
   // Display Min value
   svg.append("text")
-     .attr("transform", "translate(" + (- 70) + ",15)") // Set between inner and outer Radius
+     .attr("transform", "translate(" + -(gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",15)") // Set between inner and outer Radius
      .attr("text-anchor", "middle")
      .attr("id", "min")
-     .text(0);
+     .text(gaugeConfig.minValue);
 
   // Display Current value  
   svg.append("text")
-     .attr("transform", "translate(0," + (- 2,5) + ")") // Push up from center 1/4 of innerRadius
+     .attr("transform", "translate(0," + -(-gaugeConfig.currentLabelInset + gaugeConfig.iR / 4) + ")") // Push up from center 1/4 of innerRadius
      .attr("text-anchor", "middle")
      .attr("id", "current");
 
@@ -362,14 +391,16 @@ function updateDrawGauge(title, maxValueLabel, maxValue, value) {
   var foreground = d3.select("#" + title.replace(/\s/g, '_'))
                      .select("#foreground");
 
+  var arc = d3.arc()
+              .innerRadius(gaugeConfig.iR)
+              .outerRadius(gaugeConfig.oR)
+              .startAngle(deg2rad(-90));
+
   if (maxValueLabel == "?") {
     max.text(maxValueLabel);
     current.text("")
-    foreground.datum({ endAngle: -90 * Math.PI / 180 })
-              .attr("d", d3.arc()
-                           .innerRadius(90)
-                           .outerRadius(50)
-                           .startAngle(-90 * Math.PI / 180));
+    foreground.datum({ endAngle: deg2rad(-90) })
+              .attr("d", arc);
   }
   else {
     max.text(maxValueLabel);
@@ -379,23 +410,18 @@ function updateDrawGauge(title, maxValueLabel, maxValue, value) {
     var numPi;
 
     if (value > maxValue) 
-      numPi = Math.floor(value * 180 / maxValue - 90) * Math.PI / 180;
+      numPi = deg2rad(Math.floor(value * 180 / maxValue - 90));
     else 
-      numPi = Math.floor(value * 180 / maxValue - 90) * Math.PI / 180;
+      numPi = deg2rad(Math.floor(value * 180 / maxValue - 90));
 
     foreground.style("fill", "orange")
               .datum({ endAngle: numPi })
-              .attr("d", d3.arc()
-                           .innerRadius(90)
-                           .outerRadius(50)
-                           .startAngle(-90 * Math.PI / 180));
+              .attr("d", arc);
   }
 
 }
 
 function updateDrawPie(data) {
-
-  var radius = 50
 
   var color = d3.scaleOrdinal()
                 .domain(data)
@@ -418,7 +444,7 @@ function updateDrawPie(data) {
      .append('path')
      .attr('d', d3.arc()
                   .innerRadius(20)
-                  .outerRadius(radius))
+                  .outerRadius(pieConf.radius))
      .attr('fill', function(d){ return(color(d.data.key)) });
 
   pie.exit().remove();
@@ -463,22 +489,25 @@ function handleMouseOverPie(d) {
 
 }
 
-function handleMouseOutPie(d) {
+function handleMouseOutPie() {
   d3.selectAll("#hovering").remove();
 }
 
 function draw() {
     // rimozione di tutti gli elementi grafici nell'svg
     d3.select("#chart")
-      .selectAll("svg")
-      .selectAll("g")
+      .select("svg")
+      .select("g")
       .selectAll("g")
       .selectAll("*")
       .remove();
 
+    // updateDrawTree(d3.hierarchy([]), [])
+    // updateDrawReward([])
+
     updateDrawGauge("Numero di transazioni", "?", 0, 0);
     updateDrawGauge("Numero di blocchi abortiti", "?", 0, 0);
-    updateDrawPie({})
+    updateDrawPie({});
 
     var blockNum = document.getElementById("blockNum").value;
     var treeHeight = document.getElementById("treeHeight").value;
@@ -492,7 +521,7 @@ function draw() {
              var root = d3.hierarchy(data.data[3]);
 
              // aggiornamento del disegno
-             updateDraw(root, data.data[2]);
+             updateDrawTree(root, data.data[2]);
              updateDrawReward(data.data[2]);
 
              averageBlkTrans = 200
