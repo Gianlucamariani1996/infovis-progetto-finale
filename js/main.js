@@ -10,16 +10,15 @@ var gaugeUncles = createDrawGauge("Numero di blocchi abortiti");
 
 var gPie = d3.select("div")
              .append("div")
-             .style("display", "inline-block")
+             .attr("class", "pie")
              .append("svg")
-             .attr("width", 200)
-             .attr("height", 150)
-             .attr("id", "pie")
+             .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
+             .attr("height", "100%")
              .append("g")
-             .attr("transform", "translate(" + 100 + "," + 90 + ")");
+             .attr("transform", "translate(" + 100 + "," + 85 + ")");
 
 gPie.append("text")
-    .attr("transform", "translate(" + 0 + "," + (-65) + ")")
+    .attr("transform", "translate(" + 0 + "," + (-60) + ")")
     .attr("text-anchor", "middle")
     .text("Minatori");
 
@@ -33,8 +32,8 @@ var svg = d3.select("div")
             .append("div")
             .attr("id", "chart")
             .append("svg")
-            .attr("width", "100%")
-            .attr("height", "80vh")
+            .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
+            .attr("height", "100%")
             .call(d3.zoom() 
                     .scaleExtent([0.1, 1])  
                     .on("zoom", function() { svg.attr("transform", d3.event.transform); }))
@@ -299,10 +298,10 @@ function createDrawGauge(title) {
   // Place svg element
   var svg = d3.select("div")
               .append("div")
-              .style("display", "inline-block")
+              .attr("class", "gauge")
               .append("svg")
-              .attr("width", 200)
-              .attr("height", 150)
+              .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
+              .attr("height", "100%")
               .attr("id", title.replace(/\s/g, '_'))
               .append("g")
               .attr("transform", "translate(" + 100 + "," + 125 + ")");
@@ -409,17 +408,63 @@ function updateDrawPie(data) {
   var data_ready = pie(d3.entries(data));
 
   // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-  var pie = gPie.selectAll('path')
+  var pie = gPie.selectAll('g')
                 .data(data_ready);
   pie.enter()
+     .append('g')
+     .attr("cursor", "pointer")
+     .on("mouseover", handleMouseOverPie)
+     .on("mouseout", handleMouseOutPie)
      .append('path')
      .attr('d', d3.arc()
-                  .innerRadius(0)
+                  .innerRadius(20)
                   .outerRadius(radius))
      .attr('fill', function(d){ return(color(d.data.key)) });
 
   pie.exit().remove();
 
+}
+
+function handleMouseOverPie(d) {
+
+  var label = d3.arc()
+                .outerRadius(100)
+                .innerRadius(20)
+                .centroid(d);
+
+  d3.select(this)
+    .raise()
+    .append("rect")
+    .attr("x", label[0] - 40)
+    .attr("y", label[1] - 10)
+    .attr("width", 90)
+    .attr("height", 40)
+    .attr("stroke", "black")
+    .attr("fill", "yellow")
+    .attr("id", "hovering");
+
+  d3.select(this)
+    .append("text")
+    .attr('x', label[0])
+    .attr('y', label[1])
+    .attr('dy', '.30em')
+    .text("EtherPool")
+    .attr("text-anchor", "middle")
+    .attr("id", "hovering");
+
+  d3.select(this)
+    .append("text")
+    .attr('x', label[0])
+    .attr('y', label[1] + 20)
+    .attr('dy', '.30em')
+    .text(d.data.value)
+    .attr("text-anchor", "middle")
+    .attr("id", "hovering");
+
+}
+
+function handleMouseOutPie(d) {
+  d3.selectAll("#hovering").remove();
 }
 
 function draw() {

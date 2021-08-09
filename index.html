@@ -17,11 +17,15 @@
       <p class="paragraph">Ethereum blockchain</p>
     </div>
     <div class="form">
-      <label for="blockNum">Inserisci il numero di blocco:</label>
-      <input id="blockNum">
-      <label for="treeHeight">Inserisci l'altezza dell'albero:</label>
-      <input id="treeHeight">
-      <button type="button" onclick="draw()">Invia</button>
+      <form>
+        <label for="blockNum">Numero di blocco</label>
+        <input type="text" id="blockNum" placeholder="block number..">
+    
+        <label for="treeHeight">Altezza albero</label>
+        <input type="text" id="treeHeight" placeholder="tree height..">
+    
+        <input type="button" value="Submit" onclick="draw()">
+      </form>
     </div>
   </div>
   <script src="js/main.js"></script>
