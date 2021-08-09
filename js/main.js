@@ -5,15 +5,13 @@
 var dy = 150;
 var dx = 100;
 
-var div = d3.select("div")
-            .append("div")
-            .attr("id", "chart");
-
 var gaugeTransactions = createDrawGauge("Numero di transazioni");
 var gaugeUncles = createDrawGauge("Numero di blocchi abortiti");
 
-var gPie = d3.select("#chart")
-             .insert("svg", ":first-child")
+var gPie = d3.select("div")
+             .append("div")
+             .style("display", "inline-block")
+             .append("svg")
              .attr("width", 200)
              .attr("height", 150)
              .attr("id", "pie")
@@ -31,13 +29,16 @@ gPie.append("circle")
     .attr('r', 50)
     .style('fill', "#ddd");
 
-var svg = div.append("svg")
-             .attr("width", "100%")
-             .attr("height", "80vh")
-             .call(d3.zoom() 
-                     .scaleExtent([0.1, 1])  
-                     .on("zoom", function() { svg.attr("transform", d3.event.transform); }))
-             .append("g");
+var svg = d3.select("div")
+            .append("div")
+            .attr("id", "chart")
+            .append("svg")
+            .attr("width", "100%")
+            .attr("height", "80vh")
+            .call(d3.zoom() 
+                    .scaleExtent([0.1, 1])  
+                    .on("zoom", function() { svg.attr("transform", d3.event.transform); }))
+            .append("g");
         
 var tree = d3.tree().nodeSize([dx, dy]);
 
@@ -296,8 +297,10 @@ function updateDrawReward(lst) {
 function createDrawGauge(title) {
 
   // Place svg element
-  var svg = d3.select("#chart")
-              .insert("svg", ":first-child")
+  var svg = d3.select("div")
+              .append("div")
+              .style("display", "inline-block")
+              .append("svg")
               .attr("width", 200)
               .attr("height", 150)
               .attr("id", title.replace(/\s/g, '_'))
@@ -447,7 +450,9 @@ function draw() {
              updateDraw(root, data.data[2]);
              updateDrawReward(data.data[2]);
 
-             updateDrawGauge("Numero di transazioni", treeHeight * 500 / 1000 + "K", treeHeight * 500, data.data[0]);
+             averageBlkTrans = 200
+
+             updateDrawGauge("Numero di transazioni", treeHeight * averageBlkTrans / 1000 + "K", treeHeight * averageBlkTrans, data.data[0]);
              updateDrawGauge("Numero di blocchi abortiti", treeHeight * 2, treeHeight * 2, data.data[1]);
 
              updateDrawPie(data.data[4]);
