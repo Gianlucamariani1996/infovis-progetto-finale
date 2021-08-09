@@ -2,12 +2,16 @@
  * Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
  */
 
- var gaugeConfig = {
+var widthGaugePieCharts = 288;
+var heightGaugePieCharts = 200;
+
+var widthTreeChart = 1440;
+var heightTreeChart = 500;
+
+var gaugeConfig = {
   minValue: 0,
   maxValue: "?",
-
   currentLabelInset: 20,
-
   oR: 50,
   iR: 90
 }
@@ -24,23 +28,19 @@ var pieConf = {
   iR: 20
 }
 
-var pieSVG = d3.select("div")
+var gPie = d3.select("div")
                .append("div")
-               .attr("class", "pie")
+               .attr("class", "gaugePieCharts")
                .append("svg")
-               .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
-               .attr("height", "100%");
-
-var widthPieSVG = parseInt(pieSVG.style("width"))
-var heightPieSVG = parseInt(pieSVG.style("height"))
-
-var gPie = pieSVG.append("g")
-                  .attr("transform", "translate(" + widthPieSVG / 2 + "," + heightPieSVG * 3 / 5 + ")");
+               .attr("width", widthGaugePieCharts) //questi sono attributi svg non possono essere messi come stile
+               .attr("height", heightGaugePieCharts)
+               .append("g")
+               .attr("transform", "translate(" + widthGaugePieCharts / 2 + "," + heightGaugePieCharts * 3 / 5 + ")");
 
 gPie.append("text")
-    .attr("transform", "translate(" + 0 + "," + - (heightPieSVG * 2 / 5) + ")")
+    .attr("transform", "translate(" + 0 + "," + - (heightGaugePieCharts * 7 / 20) + ")")
     .attr("text-anchor", "middle")
-    .text("Minatori");
+    .text("Mining-pool");
 
 gPie.append("circle")
     .attr('cx', 0)
@@ -55,10 +55,10 @@ var treeConf = {
 
 var treeSVG = d3.select("div")
             .append("div")
-            .attr("id", "chart")
+            .attr("id", "treeChart")
             .append("svg")
-            .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
-            .attr("height", "100%")
+            .attr("width", widthTreeChart) //questi sono attributi svg non possono essere messi come stile
+            .attr("height", heightTreeChart)
             .call(d3.zoom() 
                     .scaleExtent([0.1, 1])  
                     .on("zoom", function() { treeSVG.attr("transform", d3.event.transform); })
@@ -98,7 +98,7 @@ var spinnerConf = {
   className: "spinner", // classe CSS assegnata allo spinner
 };
 
-var target = document.getElementById("chart");
+var target = document.getElementById("treeChart");
 var spinner = new Spinner(spinnerConf);
 
 function updateDrawTree(root, linkReward) {
@@ -108,8 +108,8 @@ function updateDrawTree(root, linkReward) {
     tree(root);
 
     root.descendants().forEach(function(node) { 
-        node.x = node.x + 150;
-        node.y = node.y + 200;
+        node.x = node.x + heightTreeChart / 2;
+        node.y = node.y + widthTreeChart * 5 / 72;
       });
 
     // clausola update per i nodi
@@ -323,22 +323,18 @@ function updateDrawReward(lst) {
 function createDrawGauge(title) {
 
   // Place svg element
-  var svg = d3.select("div")
+  var gGauge = d3.select("div")
               .append("div")
-              .attr("class", "gauge")
+              .attr("class", "gaugePieCharts")
               .append("svg")
-              .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
-              .attr("height", "100%")
-              .attr("id", title.replace(/\s/g, '_'));
+              .attr("width", widthGaugePieCharts) //questi sono attributi svg non possono essere messi come stile
+              .attr("height", heightGaugePieCharts)
+              .attr("id", title.replace(/\s/g, '_'))
+              .append("g")
+              .attr("transform", "translate(" + widthGaugePieCharts / 2 + "," + heightGaugePieCharts * 4 / 5 + ")");
 
-  var width = parseInt(svg.style("width"));
-  var height = parseInt(svg.style("height"));
-  
-  var svg = svg.append("g")
-               .attr("transform", "translate(" + width / 2 + "," + height * 7 / 8 + ")");
-
-  svg.append("text")
-     .attr("transform", "translate(" + 0 + "," + - (height * 2 / 3) + ")")
+  gGauge.append("text")
+     .attr("transform", "translate(" + 0 + "," + - (heightGaugePieCharts * 11 / 20) + ")")
      .attr("text-anchor", "middle")
      .text(title);
      
@@ -348,33 +344,33 @@ function createDrawGauge(title) {
               .startAngle(deg2rad(-90));
 
   // Append background arc to svg
-  svg.append("path")
+  gGauge.append("path")
      .datum({ endAngle: deg2rad(90) })
      .attr("d", arc)
      .attr("fill", "#ddd");
 
   // Append foreground arc to svg
-  svg.append("path")
+  gGauge.append("path")
      .attr("id", "foreground")
      .datum({ endAngle: deg2rad(-90) })
      .attr("d", arc);
 
   // Display Max value
-  svg.append("text")
+  gGauge.append("text")
      .attr("transform", "translate(" + (gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",15)") // Set between inner and outer Radius
      .attr("text-anchor", "middle")
      .attr("id", "max")
      .text(gaugeConfig.maxValue);
 
   // Display Min value
-  svg.append("text")
+  gGauge.append("text")
      .attr("transform", "translate(" + -(gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",15)") // Set between inner and outer Radius
      .attr("text-anchor", "middle")
      .attr("id", "min")
      .text(gaugeConfig.minValue);
 
   // Display Current value  
-  svg.append("text")
+  gGauge.append("text")
      .attr("transform", "translate(0," + -(-gaugeConfig.currentLabelInset + gaugeConfig.iR / 4) + ")") // Push up from center 1/4 of innerRadius
      .attr("text-anchor", "middle")
      .attr("id", "current");
@@ -462,10 +458,10 @@ function handleMouseOverPie(d) {
   d3.select(this)
     .raise()
     .append("rect")
-    .attr("x", label[0] - 40)
+    .attr("x", label[0] - 45)
     .attr("y", label[1] - 10)
     .attr("width", 90)
-    .attr("height", 40)
+    .attr("height", 20)
     .attr("stroke", "black")
     .attr("fill", "yellow")
     .attr("id", "hovering");
@@ -473,21 +469,11 @@ function handleMouseOverPie(d) {
   d3.select(this)
     .append("text")
     .attr('x', label[0])
-    .attr('y', label[1])
-    .attr('dy', '.30em')
-    .text("EtherPool")
+    .attr('y', label[1] + 5)
+    .text("EtherPool: " + d.data.value)
     .attr("text-anchor", "middle")
     .attr("id", "hovering");
-
-  d3.select(this)
-    .append("text")
-    .attr('x', label[0])
-    .attr('y', label[1] + 20)
-    .attr('dy', '.30em')
-    .text(d.data.value)
-    .attr("text-anchor", "middle")
-    .attr("id", "hovering");
-
+    
 }
 
 function handleMouseOutPie() {
@@ -496,7 +482,7 @@ function handleMouseOutPie() {
 
 function draw() {
     // rimozione di tutti gli elementi grafici nell'svg
-    d3.select("#chart")
+    d3.select("#treeChart")
       .select("svg")
       .select("g")
       .selectAll("g")
