@@ -20,31 +20,32 @@ var gaugeTransactions = createDrawGauge("Numero di transazioni");
 var gaugeUncles = createDrawGauge("Numero di blocchi abortiti");
 
 var pieConf = {
-  radius: 50
+  oR: 50,
+  iR: 20
 }
 
 var pieSVG = d3.select("div")
-             .append("div")
-             .attr("class", "pie")
-             .append("svg")
-             .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
-             .attr("height", "100%");
+               .append("div")
+               .attr("class", "pie")
+               .append("svg")
+               .attr("width", "100%") //questi sono attributi svg non possono essere messi come stile
+               .attr("height", "100%");
 
-width = parseInt(pieSVG.style("width")) / 2
-height = parseInt(pieSVG.style("height"))
+var widthPieSVG = parseInt(pieSVG.style("width"))
+var heightPieSVG = parseInt(pieSVG.style("height"))
 
 var gPie = pieSVG.append("g")
-                  .attr("transform", "translate(" + width + "," + height * 3 / 5 + ")");
+                  .attr("transform", "translate(" + widthPieSVG / 2 + "," + heightPieSVG * 3 / 5 + ")");
 
 gPie.append("text")
-    .attr("transform", "translate(" + 0 + "," + - (height * 2 / 5) + ")")
+    .attr("transform", "translate(" + 0 + "," + - (heightPieSVG * 2 / 5) + ")")
     .attr("text-anchor", "middle")
     .text("Minatori");
 
 gPie.append("circle")
     .attr('cx', 0)
     .attr('cy', 0)
-    .attr('r', pieConf.radius)
+    .attr('r', pieConf.oR)
     .style('fill', "#ddd");
 
 var treeConf = {
@@ -64,7 +65,7 @@ var treeSVG = d3.select("div")
                     )
             .on("dblclick.zoom", null)
             .append("g");
-        
+
 var tree = d3.tree().nodeSize([treeConf.dx, treeConf.dy]);
 
 // inizialmente vuoto
@@ -107,8 +108,8 @@ function updateDrawTree(root, linkReward) {
     tree(root);
 
     root.descendants().forEach(function(node) { 
-        node.x = node.x + 300;
-        node.y = node.y + 100;
+        node.x = node.x + 150;
+        node.y = node.y + 200;
       });
 
     // clausola update per i nodi
@@ -443,8 +444,8 @@ function updateDrawPie(data) {
      .on("mouseout", handleMouseOutPie)
      .append('path')
      .attr('d', d3.arc()
-                  .innerRadius(20)
-                  .outerRadius(pieConf.radius))
+                  .innerRadius(pieConf.iR)
+                  .outerRadius(pieConf.oR))
      .attr('fill', function(d){ return(color(d.data.key)) });
 
   pie.exit().remove();
