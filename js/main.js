@@ -197,7 +197,7 @@ function handleMouseOver(d) {
           .append("rect")
           .attr("y", 15)
           .attr("x", -15)
-          .attr("width", 640)
+          .attr("width", 800)
           .attr("height", 240)
           .attr("stroke", "black")
           .attr("fill", "yellow")
@@ -272,7 +272,7 @@ function handleMouseOver(d) {
           .append("rect")
           .attr("y", 15)
           .attr("x", -15)
-          .attr("width", 100)
+          .attr("width", 120)
           .attr("height", 30)
           .attr("stroke", "black")
           .attr("fill", "yellow")
@@ -407,7 +407,7 @@ function updateDrawGauge(title, maxValueLabel, maxValue, value) {
     var numPi;
 
     if (value > maxValue) 
-      numPi = deg2rad(Math.floor(value * 180 / maxValue - 90));
+      numPi = deg2rad(Math.floor(maxValue * 180 / maxValue - 90));
     else 
       numPi = deg2rad(Math.floor(value * 180 / maxValue - 90));
 
@@ -458,10 +458,10 @@ function handleMouseOverPie(d) {
   d3.select(this)
     .raise()
     .append("rect")
-    .attr("x", label[0] - 45)
-    .attr("y", label[1] - 10)
-    .attr("width", 90)
-    .attr("height", 20)
+    .attr("x", label[0] - 60)
+    .attr("y", label[1] - 15)
+    .attr("width", 120)
+    .attr("height", 25)
     .attr("stroke", "black")
     .attr("fill", "yellow")
     .attr("id", "hovering");

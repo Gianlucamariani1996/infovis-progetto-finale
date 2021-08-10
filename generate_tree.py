@@ -32,11 +32,15 @@ def generate_tree(block_num, height):
     total_trans_uncles_number = [0, 0]
     links_uncle_reward = []
     famous_miner = {}
-
-    if block_num >= 7:
-        generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
+    if block_num == "latest":
+        block_num = int(web3.eth.getBlock("latest")["number"])
+        generated_tree = generate_tree_aux(block_num - height, height - 1, block_num - height, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
     else:
-        generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
+        block_num = int(block_num)
+        if block_num >= 7:
+            generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
+        else:
+            generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
 
     append_blocks(generated_tree, blocks_to_append, total_trans_uncles_number)
 
@@ -101,6 +105,6 @@ CORS(api)
 def get_companies():
     block = request.args.get('block')
     height = request.args.get('height')
-    return generate_tree(int(block), int(height))
+    return generate_tree(block, int(height))
 
 api.run()
