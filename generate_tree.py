@@ -43,10 +43,13 @@ def generate_tree(block_num, height):
         generated_tree = generate_tree_aux(block_num - height, height - 1, block_num - height, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
     else:
         block_num = int(block_num)
-        if block_num >= 7:
-            generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
-        else:
-            generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
+        if height > 7:
+            if block_num >= 7:
+                generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
+            else:
+                generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
+        else: 
+            generated_tree = generate_tree_aux(block_num - height + 1, height - 1, block_num - height + 1, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
 
     append_blocks(generated_tree, blocks_to_append, total_trans_uncles_number)
 
