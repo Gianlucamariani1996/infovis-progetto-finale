@@ -38,7 +38,7 @@ def generate_tree(block_num, height):
         "0x1aD91ee08f21bE3dE0BA2ba6918E714dA6B45836": ["Hiveon Pool", 0],
         "Other": ["Altri", 0]
     }
-    if block_num == "latest":
+    if block_num == "ultimo":
         block_num = int(web3.eth.getBlock("latest")["number"])
         generated_tree = generate_tree_aux(block_num - height, height - 1, block_num - height, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
     else:

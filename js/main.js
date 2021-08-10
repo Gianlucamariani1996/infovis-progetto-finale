@@ -131,6 +131,7 @@ var treeSVG = d3.select("div")
             .append("svg")
             .attr("width", widthTreeChart) //questi sono attributi svg non possono essere messi come stile
             .attr("height", heightTreeChart)
+            .attr("id", "treeSVG")
             .call(d3.zoom() 
                     .scaleExtent([0.1, 1])  
                     .on("zoom", function() { treeSVG.attr("transform", d3.event.transform); })
@@ -216,8 +217,8 @@ function updateDrawTree(root, linkReward) {
              .attr("x", function(d) { 
                 if (d.data.uncles != null) {
                   digits = d.data.height.toString().length
-                  if (digits == 1)  return 10
-                  else return 10 - (5*(digits-1)) 
+                  if (digits == 1)  return 9
+                  else return 9 - (6 * (digits - 1)) 
                 }
                 else return -17;
               })
@@ -573,7 +574,7 @@ function handleMouseOverPie(d) {
     .append("rect")
     .attr("x", label[0] - 60)
     .attr("y", label[1] - 15)
-    .attr("width", 120)
+    .attr("width", 140)
     .attr("height", 25)
     .attr("stroke", "black")
     .attr("fill", "yellow")
@@ -581,7 +582,7 @@ function handleMouseOverPie(d) {
 
   d3.select(this)
     .append("text")
-    .attr('x', label[0])
+    .attr('x', label[0] + 10)
     .attr('y', label[1] + 5)
     .text(d.data.key + ": " + d.data.value)
     .attr("text-anchor", "middle")
@@ -617,6 +618,11 @@ function draw() {
     axios.get("http://localhost:5000/generate-tree?block=" + blockNum + "&height=" + treeHeight)
          .then(function(data) {
              spinner.stop();
+
+             d3.select("#treeSVG")
+               .call(d3.zoom() 
+                       .scaleExtent([0.1, 1])  
+                       .on("zoom", function() { treeSVG.attr("transform", d3.event.transform); }).transform, d3.zoomIdentity.translate(0, 0).scale(1))
 
              var root = d3.hierarchy(data.data[3]);
 
