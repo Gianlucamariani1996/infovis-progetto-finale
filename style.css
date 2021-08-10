@@ -23,13 +23,14 @@ body {
 }
 
 input[type=text] {
-  width: 140px;
+  width: 165px;
   padding-top: 12px;
   padding-bottom: 12px;
   padding-left: 20px;
   padding-right: 20px;
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-right: 7px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;

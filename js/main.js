@@ -3,10 +3,10 @@
  */
 
  var colorMiner = {
-  "Ethermine": "blue",
-  "SparkPool": "red",
-  "f2pool": "green",
-  "Hiveon Pool": "brown",
+  "Ethermine": "rgb(51, 102, 204)",
+  "SparkPool": "rgb(220, 57, 19)",
+  "f2pool": "rgb(16,150,24)",
+  "Hiveon Pool": "rgb(153, 1, 153)",
   "Altri": "grey"
 }
 
@@ -91,14 +91,14 @@ gLegend.append("rect")
 gLegend.append('text')
        .attr('x', 60)
        .attr('y', 30)
-       .text("blocco della catena principale");
+       .text("blocco catena principale");
 
 gLegend.append("rect")
        .attr("x", 10)
        .attr("y", 50)
        .attr("width", 30)
        .attr("height", 10)
-       .attr('fill', "red")   
+       .attr('fill', "rgb(247, 32, 32)")   
 
 gLegend.append('text')
        .attr('x', 60)
@@ -108,17 +108,17 @@ gLegend.append('text')
 gLegend.append("path")
        .attr("d", "M " + 10 + "," + 85 + "H" + 40)
        .attr("stroke-dasharray", "5,5")
-       .attr("stroke", "red")
+       .attr("stroke", "rgb(247, 32, 32)")
 
 gLegend.append("path")
        .attr("d", "M " + 40 + "," + 85 + "L" + (40 - 10) + "," + (85 - 7) + " L" + (40 - 10) + "," + (85 + 7) + "Z")
-       .attr("fill", "red")
+       .attr("fill", "rgb(247, 32, 32)")
        .attr("stroke", "none")
 
 gLegend.append('text')
        .attr('x', 60)
        .attr('y', 90)
-       .text("uncle ricompensati");
+       .text("uncle ricompensato");
 
 var treeConf = {
   dy: 150,
@@ -191,8 +191,9 @@ function updateDrawTree(root, linkReward) {
                     .data(nodes, function(d) { return d.data.hash });
 
     // clausola enter per i nodi
+    // si deve mettere l'insert perché quando si sta su un nodo e si clicca i figli vanno messi in testa, se vanno messi in coda il disegno viene sovrapposto
     var nodeEnter = node.enter()
-                        .append("g")
+                        .insert("g", ":first-child")
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
@@ -209,7 +210,7 @@ function updateDrawTree(root, linkReward) {
              .attr("fill", function(d) {
                  if (d.children || d._children || d.data.uncles != null) 
                     return "green";
-                 else return "red";
+                 else return "rgb(247, 32, 32)";
              });
 
     nodeEnter.append("text")
@@ -267,7 +268,7 @@ function handleMouseOver(d) {
     d3.select(this)
       .raise()
       .select("text")
-      .attr("fill", "red");
+      .attr("fill", "rgb(247, 32, 32)");
 
     // si controlla se si sta su un blocco della catena principale oppure si è su un blocco abortito
     if (d.data.uncles != null) {
@@ -277,9 +278,9 @@ function handleMouseOver(d) {
           .attr("y", 15)
           .attr("x", -15)
           .attr("width", 800)
-          .attr("height", 240)
+          .attr("height", 220)
           .attr("stroke", "black")
-          .attr("fill", "yellow")
+          .attr("fill", "rgb(255, 255, 130)")
           .attr("id", "hovering");
 
         d3.select(this)
@@ -288,19 +289,11 @@ function handleMouseOver(d) {
           .attr("x", -10)
           .text("hash: " + d.data.hash)
           .attr("text-anchor", "start")
-          .attr("id", "hovering");
-
-        d3.select(this)
-          .append("text")
-          .attr("y", 65)
-          .attr("x", -10)
-          .text("altezza/numero di blocco: " + d.data.height)
-          .attr("text-anchor", "start")
           .attr("id", "hovering"); 
 
         d3.select(this)
           .append("text")
-          .attr("y", 95)
+          .attr("y", 65)
           .attr("x", -10)
           .text("numero di transazioni: " + d.data.trans_num)
           .attr("text-anchor", "start")
@@ -308,7 +301,7 @@ function handleMouseOver(d) {
 
         d3.select(this)
           .append("text")
-          .attr("y", 125)
+          .attr("y", 95)
           .attr("x", -10)
           .text("uncle ricompensati: [" + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }) + "]")
           .attr("text-anchor", "start")
@@ -316,7 +309,7 @@ function handleMouseOver(d) {
 
         d3.select(this)
           .append("text")
-          .attr("y", 155)
+          .attr("y", 125)
           .attr("x", -10)
           .text("limite di gas: " + d.data.gas_limit)
           .attr("text-anchor", "start")
@@ -324,7 +317,7 @@ function handleMouseOver(d) {
 
         d3.select(this)
           .append("text")
-          .attr("y", 185)
+          .attr("y", 155)
           .attr("x", -10)
           .text("gas usato: " + d.data.gas_used)
           .attr("text-anchor", "start")
@@ -332,7 +325,7 @@ function handleMouseOver(d) {
 
         d3.select(this)
           .append("text")
-          .attr("y", 215)
+          .attr("y", 185)
           .attr("x", -10)
           .text(function() { if (miners[d.data.miner] == null) return "minato da: " + d.data.miner; else return "minato da: " + d.data.miner + " (" + miners[d.data.miner] + ")"; }) 
           .attr("text-anchor", "start")
@@ -340,7 +333,7 @@ function handleMouseOver(d) {
 
         d3.select(this)
           .append("text")
-          .attr("y", 245)
+          .attr("y", 215)
           .attr("x", -10)
           .text("nonce: " + d.data.nonce)
           .attr("text-anchor", "start")
@@ -354,7 +347,7 @@ function handleMouseOver(d) {
           .attr("width", 120)
           .attr("height", 30)
           .attr("stroke", "black")
-          .attr("fill", "yellow")
+          .attr("fill", "rgb(255, 255, 130)")
           .attr("id", "hovering");
 
         d3.select(this)
@@ -388,11 +381,11 @@ function updateDrawReward(lst) {
         gReward.append("path")
                 .attr("d", "M " + x1 + "," + y1 + "Q" + x1 + "," + y2 + " " + x2 + "," + y2)
                 .attr("stroke-dasharray", "10,10")
-                .attr("stroke", "red")
+                .attr("stroke", "rgb(247, 32, 32)")
                 .attr("id", "reward");
         gReward.append("path")
                .attr("d", "M " + x2 + "," + y2 + "L" + (x2 + 15) + "," + (y2 - 8) + " L" + (x2 + 15) + "," + (y2 + 8) + "Z")
-               .attr("fill", "red")
+               .attr("fill", "rgb(247, 32, 32)")
                .attr("stroke", "none")
                .attr("id", "reward");
       }
@@ -456,8 +449,48 @@ function createDrawGauge(title) {
 
 }
 
-function updateDrawGauge(title, maxValueLabel, maxValue, value) {
+function getColor(value, maxValue) {
+  var ticks = [{
+    tick: 0,
+    color: 'green'
+  }, {
+    tick: maxValue * 1 / 4,
+    color: 'yellow'
+  }, {
+    tick: maxValue * 3 / 4,
+    color: 'orange'
+  }, {
+    tick: maxValue,
+    color: 'rgb(247, 32, 32)'
+  }]
+  console.log(ticks)
+  var ret;
+  ticks.forEach(function(tick) {
+    if (value > tick.tick) {
+      ret = tick.color
+    }
+  });
+  return ret;
+}
 
+function arcTween(transition, newAngle) {
+  var arc = d3.arc()
+              .innerRadius(gaugeConfig.iR)
+              .outerRadius(gaugeConfig.oR)
+              .startAngle(deg2rad(-90));
+              
+  transition.attrTween("d", function(d) {
+                var interpolate = d3.interpolate(d.endAngle, newAngle);
+                return function(t) {
+                  d.endAngle = interpolate(t);
+                  return arc(d);
+                };
+            });
+}
+
+function updateDrawGauge(title, maxValueLabel, maxValue, value) {
+  var curColor = "green";
+  var newColor = getColor(value, maxValue);
   var max = d3.select("#" + title.replace(/\s/g, '_'))
               .select("#max");
 
@@ -490,9 +523,12 @@ function updateDrawGauge(title, maxValueLabel, maxValue, value) {
     else 
       numPi = deg2rad(Math.floor(value * 180 / maxValue - 90));
 
-    foreground.style("fill", "orange")
-              .datum({ endAngle: numPi })
-              .attr("d", arc);
+      foreground.transition()
+                .duration(2000)
+                .styleTween("fill", function() {
+                  return d3.interpolate(curColor, newColor);
+                })
+                .call(arcTween, numPi);
   }
 
 }
@@ -577,7 +613,7 @@ function handleMouseOverPie(d) {
     .attr("width", 140)
     .attr("height", 25)
     .attr("stroke", "black")
-    .attr("fill", "yellow")
+    .attr("fill", "rgb(255, 255, 130)")
     .attr("id", "hovering");
 
   d3.select(this)
