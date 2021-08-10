@@ -30,24 +30,35 @@ def generate_tree(block_num, height):
     blocks_to_append = {}
     # si usa la lista per il passaggio per valore/riferimento
     total_trans_uncles_number = [0, 0]
-    links_uncle_reward = []
-    famous_miner = {}
+    links_uncle_reward = [] 
+    all_famous_miner = { 
+        "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8": ["Ethermine", 0],
+        "0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c": ["SparkPool", 0],
+        "0x829BD824B016326A401d083B33D092293333A830": ["f2pool", 0],
+        "0x1aD91ee08f21bE3dE0BA2ba6918E714dA6B45836": ["Hiveon Pool", 0],
+        "Other": ["Altri", 0]
+    }
     if block_num == "latest":
         block_num = int(web3.eth.getBlock("latest")["number"])
-        generated_tree = generate_tree_aux(block_num - height, height - 1, block_num - height, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
+        generated_tree = generate_tree_aux(block_num - height, height - 1, block_num - height, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
     else:
         block_num = int(block_num)
         if block_num >= 7:
-            generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
+            generated_tree = generate_tree_aux(block_num - 7, height - 1, block_num - 7, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
         else:
-            generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner)
+            generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
 
     append_blocks(generated_tree, blocks_to_append, total_trans_uncles_number)
+
+    famous_miner = {}
+    for key in all_famous_miner:
+        if all_famous_miner[key][1] != 0:
+            famous_miner[all_famous_miner[key][0]] = all_famous_miner[key][1]
 
     string_of_trans_uncles_tree = json.dumps([total_trans_uncles_number[0], total_trans_uncles_number[1], links_uncle_reward, generated_tree, famous_miner])
     return string_of_trans_uncles_tree
 
-def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner):
+def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner):
     block = web3.eth.getBlock(root)
     root_hash = block["hash"].hex()
     uncles_number = web3.eth.get_uncle_count(root)
@@ -61,10 +72,10 @@ def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_u
     miner = block['miner']
     nonce = block['nonce'].hex()
 
-    if miner not in famous_miner:
-        famous_miner[miner] = 1
+    if miner not in all_famous_miner:
+        all_famous_miner["Other"][1] += 1
     else:
-        famous_miner[miner] += 1
+        all_famous_miner[miner][1] += 1
 
     total_trans_uncles_number[0] += trans_num
     tree = Tree(root_hash, block_height, trans_num, uncles, gas_limit, gas_used, miner, nonce)
@@ -72,7 +83,7 @@ def generate_tree_aux(root, height, height_root, blocks_to_append, total_trans_u
     if height == 0:
         generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
     else: 
-        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward, famous_miner))
+        tree.children.append(generate_tree_aux(root + 1, height -1, height_root, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner))
         generate_blocks_to_append(root, root_hash, uncles_number, height_root, blocks_to_append, links_uncle_reward)
         
     return tree

@@ -2,8 +2,14 @@
  * Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
  */
 
-var widthGaugePieCharts = 288;
+var widthGaugeCharts = 288;
 var heightGaugePieCharts = 200;
+
+var widthPieChart = 400;
+var heightPieChart = 200;
+
+var widthLegend = 464;
+var heightLegend = 200;
 
 var widthTreeChart = 1440;
 var heightTreeChart = 500;
@@ -32,13 +38,13 @@ var gPie = d3.select("div")
                .append("div")
                .attr("class", "gaugePieCharts")
                .append("svg")
-               .attr("width", widthGaugePieCharts) //questi sono attributi svg non possono essere messi come stile
-               .attr("height", heightGaugePieCharts)
+               .attr("width", widthPieChart) //questi sono attributi svg non possono essere messi come stile
+               .attr("height", heightPieChart)
                .append("g")
-               .attr("transform", "translate(" + widthGaugePieCharts / 2 + "," + heightGaugePieCharts * 3 / 5 + ")");
+               .attr("transform", "translate(" + widthPieChart / 3 + "," + heightPieChart * 3 / 5 + ")");
 
 gPie.append("text")
-    .attr("transform", "translate(" + 0 + "," + - (heightGaugePieCharts * 7 / 20) + ")")
+    .attr("transform", "translate(" + 0 + "," + - (heightPieChart * 7 / 20) + ")")
     .attr("text-anchor", "middle")
     .text("Mining-pool");
 
@@ -47,6 +53,57 @@ gPie.append("circle")
     .attr('cy', 0)
     .attr('r', pieConf.oR)
     .style('fill', "#ddd");
+
+var gLegend = d3.select("div")
+               .append("div")
+               .attr("class", "gaugePieCharts")
+               .append("svg")
+               .attr("width", widthLegend) //questi sono attributi svg non possono essere messi come stile
+               .attr("height", heightLegend)
+               .append("g")
+               .attr("transform", "translate(" + widthLegend * 15 / 58 + "," + heightLegend * 1 / 4 + ")");
+
+gLegend.append('text')
+       .text("Legenda:");
+
+gLegend.append("rect")
+       .attr("x", 10)
+       .attr("y", 20)
+       .attr("width", 30)
+       .attr("height", 10)
+       .attr('fill', "green");         
+        
+gLegend.append('text')
+       .attr('x', 60)
+       .attr('y', 30)
+       .text("blocco della catena principale");
+
+gLegend.append("rect")
+       .attr("x", 10)
+       .attr("y", 50)
+       .attr("width", 30)
+       .attr("height", 10)
+       .attr('fill', "red")   
+
+gLegend.append('text')
+       .attr('x', 60)
+       .attr('y', 60)
+       .text("blocco abortito/uncle");
+
+gLegend.append("path")
+       .attr("d", "M " + 10 + "," + 85 + "H" + 40)
+       .attr("stroke-dasharray", "5,5")
+       .attr("stroke", "red")
+
+gLegend.append("path")
+       .attr("d", "M " + 40 + "," + 85 + "L" + (40 - 10) + "," + (85 - 7) + " L" + (40 - 10) + "," + (85 + 7) + "Z")
+       .attr("fill", "red")
+       .attr("stroke", "none")
+
+gLegend.append('text')
+       .attr('x', 60)
+       .attr('y', 90)
+       .text("ricompensa blocco abortito");
 
 var treeConf = {
   dy: 150,
@@ -307,12 +364,12 @@ function updateDrawReward(lst) {
         x2 = d3.select("#n" + e[1])._groups[0][0].__data__.y + 30;
         y2 = d3.select("#n" + e[1])._groups[0][0].__data__.x; 
         gReward.append("path")
-                .attr("d", "M " + x1 + ","+ y1 + "Q" + x1 + "," + y2 + " " + x2 + ","+ y2)
+                .attr("d", "M " + x1 + "," + y1 + "Q" + x1 + "," + y2 + " " + x2 + "," + y2)
                 .attr("stroke-dasharray", "10,10")
                 .attr("stroke", "red")
                 .attr("id", "reward");
         gReward.append("path")
-               .attr("d", "M " + x2 + ","+ y2 + "L" + (x2 + 15) + "," + (y2 - 8) + " L" + (x2 + 15) + ","+ (y2 + 8) + "Z")
+               .attr("d", "M " + x2 + "," + y2 + "L" + (x2 + 15) + "," + (y2 - 8) + " L" + (x2 + 15) + "," + (y2 + 8) + "Z")
                .attr("fill", "red")
                .attr("stroke", "none")
                .attr("id", "reward");
@@ -327,11 +384,11 @@ function createDrawGauge(title) {
               .append("div")
               .attr("class", "gaugePieCharts")
               .append("svg")
-              .attr("width", widthGaugePieCharts) //questi sono attributi svg non possono essere messi come stile
+              .attr("width", widthGaugeCharts) //questi sono attributi svg non possono essere messi come stile
               .attr("height", heightGaugePieCharts)
               .attr("id", title.replace(/\s/g, '_'))
               .append("g")
-              .attr("transform", "translate(" + widthGaugePieCharts / 2 + "," + heightGaugePieCharts * 4 / 5 + ")");
+              .attr("transform", "translate(" + widthGaugeCharts / 2 + "," + heightGaugePieCharts * 4 / 5 + ")");
 
   gGauge.append("text")
      .attr("transform", "translate(" + 0 + "," + - (heightGaugePieCharts * 11 / 20) + ")")
@@ -357,14 +414,14 @@ function createDrawGauge(title) {
 
   // Display Max value
   gGauge.append("text")
-     .attr("transform", "translate(" + (gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",15)") // Set between inner and outer Radius
+     .attr("transform", "translate(" + (gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",20)") // Set between inner and outer Radius
      .attr("text-anchor", "middle")
      .attr("id", "max")
      .text(gaugeConfig.maxValue);
 
   // Display Min value
   gGauge.append("text")
-     .attr("transform", "translate(" + -(gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",15)") // Set between inner and outer Radius
+     .attr("transform", "translate(" + -(gaugeConfig.iR + ((gaugeConfig.oR - gaugeConfig.iR) / 2)) + ",20)") // Set between inner and outer Radius
      .attr("text-anchor", "middle")
      .attr("id", "min")
      .text(gaugeConfig.minValue);
@@ -446,6 +503,36 @@ function updateDrawPie(data) {
 
   pie.exit().remove();
 
+  var legendRectSize = 18;
+  var legendSpacing = 4;
+
+  var legend = gPie.selectAll('.legend')
+                   .data(color.domain()).enter()
+                   .append('g')
+                   .attr('class', 'legend')
+                   .attr('transform', function(d, i) {
+                      var height = legendRectSize + legendSpacing;
+                      var offset =  height * color.domain().length / 2;
+                      var horz = 5 * legendRectSize;
+                      var vert = i * height - offset;
+                      return 'translate(' + horz + ',' + vert + ')';
+                    });
+
+  legend.append('rect')
+        .attr('width', 10)
+        .attr('height', 10)                                   
+        .style('fill', color)
+        .style('stroke', color)          
+        .attr('rx', 5)
+        .attr('ry', 5)                    
+            
+  legend.append('text')
+        .attr('x', 13 + legendSpacing)
+        .attr('y', 13 - legendSpacing)
+        .text(function(d) { return d; });
+
+  legend.exit().remove();
+
 }
 
 function handleMouseOverPie(d) {
@@ -470,7 +557,7 @@ function handleMouseOverPie(d) {
     .append("text")
     .attr('x', label[0])
     .attr('y', label[1] + 5)
-    .text("EtherPool: " + d.data.value)
+    .text(d.data.key + ": " + d.data.value)
     .attr("text-anchor", "middle")
     .attr("id", "hovering");
     
