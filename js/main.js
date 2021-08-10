@@ -2,13 +2,28 @@
  * Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
  */
 
-var widthGaugeCharts = 288;
+ var colorMiner = {
+  "Ethermine": "blue",
+  "SparkPool": "red",
+  "f2pool": "green",
+  "Hiveon Pool": "brown",
+  "Altri": "grey"
+}
+
+var miners = {
+  "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8": "Ethermine",
+  "0x5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c": "SparkPool",
+  "0x829BD824B016326A401d083B33D092293333A830": "f2pool",
+  "0x1aD91ee08f21bE3dE0BA2ba6918E714dA6B45836": "Hiveon Pool",
+}
+
+var widthGaugeCharts = 360;
 var heightGaugePieCharts = 200;
 
-var widthPieChart = 400;
+var widthPieChart = 360;
 var heightPieChart = 200;
 
-var widthLegend = 464;
+var widthLegend = 360;
 var heightLegend = 200;
 
 var widthTreeChart = 1440;
@@ -27,7 +42,7 @@ function deg2rad(deg) {
 }
 
 var gaugeTransactions = createDrawGauge("Numero di transazioni");
-var gaugeUncles = createDrawGauge("Numero di blocchi abortiti");
+var gaugeUncles = createDrawGauge("Numero di blocchi uncle");
 
 var pieConf = {
   oR: 50,
@@ -46,7 +61,7 @@ var gPie = d3.select("div")
 gPie.append("text")
     .attr("transform", "translate(" + 0 + "," + - (heightPieChart * 7 / 20) + ")")
     .attr("text-anchor", "middle")
-    .text("Mining-pool");
+    .text("Minatori");
 
 gPie.append("circle")
     .attr('cx', 0)
@@ -61,7 +76,7 @@ var gLegend = d3.select("div")
                .attr("width", widthLegend) //questi sono attributi svg non possono essere messi come stile
                .attr("height", heightLegend)
                .append("g")
-               .attr("transform", "translate(" + widthLegend * 15 / 58 + "," + heightLegend * 1 / 4 + ")");
+               .attr("transform", "translate(" + widthLegend * 1 / 12 + "," + heightLegend * 1 / 4 + ")");
 
 gLegend.append('text')
        .text("Legenda:");
@@ -88,7 +103,7 @@ gLegend.append("rect")
 gLegend.append('text')
        .attr('x', 60)
        .attr('y', 60)
-       .text("blocco abortito/uncle");
+       .text("blocco uncle");
 
 gLegend.append("path")
        .attr("d", "M " + 10 + "," + 85 + "H" + 40)
@@ -103,7 +118,7 @@ gLegend.append("path")
 gLegend.append('text')
        .attr('x', 60)
        .attr('y', 90)
-       .text("ricompensa blocco abortito");
+       .text("uncle ricompensati");
 
 var treeConf = {
   dy: 150,
@@ -176,7 +191,7 @@ function updateDrawTree(root, linkReward) {
 
     // clausola enter per i nodi
     var nodeEnter = node.enter()
-                        .insert("g", ":first-child")
+                        .append("g")
                         .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - 5) + ")" })
                         .attr("fill-opacity", 1)
                         .attr("stroke-opacity", 1)
@@ -198,9 +213,15 @@ function updateDrawTree(root, linkReward) {
 
     nodeEnter.append("text")
              .attr("y", -5)
-             .attr("x", 60)
-             .attr("text-anchor", "end")
-             .text(function(d) { return d.data.hash.slice(0, 3) + "..." + d.data.hash.slice(63, 66); });
+             .attr("x", function(d) { 
+                if (d.data.uncles != null) {
+                  digits = d.data.height.toString().length
+                  if (digits == 1)  return 10
+                  else return 10 - (5*(digits-1)) 
+                }
+                else return -17;
+              })
+             .text(function(d) { if (d.data.uncles != null) return d.data.height; else return d.data.hash.slice(0, 3) + "..." + d.data.hash.slice(63, 66); });
 
     // clausola exit per i nodi
     node.exit().remove();
@@ -288,7 +309,7 @@ function handleMouseOver(d) {
           .append("text")
           .attr("y", 125)
           .attr("x", -10)
-          .text("blocchi pagati: " + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }))
+          .text("uncle ricompensati: [" + d.data.uncles.map(function(e) { return e.slice(0, 3) + "..." + e.slice(63, 66) }) + "]")
           .attr("text-anchor", "start")
           .attr("id", "hovering");
 
@@ -312,7 +333,7 @@ function handleMouseOver(d) {
           .append("text")
           .attr("y", 215)
           .attr("x", -10)
-          .text("minato da: " + d.data.miner)
+          .text(function() { if (miners[d.data.miner] == null) return "minato da: " + d.data.miner; else return "minato da: " + d.data.miner + " (" + miners[d.data.miner] + ")"; }) 
           .attr("text-anchor", "start")
           .attr("id", "hovering");
 
@@ -477,9 +498,12 @@ function updateDrawGauge(title, maxValueLabel, maxValue, value) {
 
 function updateDrawPie(data) {
 
-  var color = d3.scaleOrdinal()
-                .domain(data)
-                .range(["red", "blue", "green", "orange", "grey"]);
+  // var color = d3.scaleOrdinal()
+  //               .domain(data)
+  //               .range(["red", "blue", "green", "orange", "grey"]);
+
+  var miners = [];
+  var colors = [];
 
   // Compute the position of each group on the pie:
   var pie = d3.pie()
@@ -490,6 +514,7 @@ function updateDrawPie(data) {
   // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
   var pie = gPie.selectAll('g')
                 .data(data_ready);
+
   pie.enter()
      .append('g')
      .attr("cursor", "pointer")
@@ -499,7 +524,7 @@ function updateDrawPie(data) {
      .attr('d', d3.arc()
                   .innerRadius(pieConf.iR)
                   .outerRadius(pieConf.oR))
-     .attr('fill', function(d){ return(color(d.data.key)) });
+     .attr('fill', function(d){ colors.push(colorMiner[d.data.key]); miners.push(d.data.key); return(colorMiner[d.data.key]); });
 
   pie.exit().remove();
 
@@ -507,12 +532,13 @@ function updateDrawPie(data) {
   var legendSpacing = 4;
 
   var legend = gPie.selectAll('.legend')
-                   .data(color.domain()).enter()
+                   .data(miners)
+                   .enter()
                    .append('g')
                    .attr('class', 'legend')
                    .attr('transform', function(d, i) {
                       var height = legendRectSize + legendSpacing;
-                      var offset =  height * color.domain().length / 2;
+                      var offset =  height * colors.length / 2;
                       var horz = 5 * legendRectSize;
                       var vert = i * height - offset;
                       return 'translate(' + horz + ',' + vert + ')';
@@ -521,8 +547,8 @@ function updateDrawPie(data) {
   legend.append('rect')
         .attr('width', 10)
         .attr('height', 10)                                   
-        .style('fill', color)
-        .style('stroke', color)          
+        .style('fill', function(d) { return colorMiner[d]; } )
+        .style('stroke', function(d) { return colorMiner[d]; })          
         .attr('rx', 5)
         .attr('ry', 5)                    
             
@@ -580,7 +606,7 @@ function draw() {
     // updateDrawReward([])
 
     updateDrawGauge("Numero di transazioni", "?", 0, 0);
-    updateDrawGauge("Numero di blocchi abortiti", "?", 0, 0);
+    updateDrawGauge("Numero di blocchi uncle", "?", 0, 0);
     updateDrawPie({});
 
     var blockNum = document.getElementById("blockNum").value;
@@ -601,7 +627,7 @@ function draw() {
              averageBlkTrans = 200
 
              updateDrawGauge("Numero di transazioni", treeHeight * averageBlkTrans / 1000 + "K", treeHeight * averageBlkTrans, data.data[0]);
-             updateDrawGauge("Numero di blocchi abortiti", treeHeight * 2, treeHeight * 2, data.data[1]);
+             updateDrawGauge("Numero di blocchi uncle", treeHeight * 2, treeHeight * 2, data.data[1]);
 
              updateDrawPie(data.data[4]);
             
