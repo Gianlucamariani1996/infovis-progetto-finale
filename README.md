@@ -64,3 +64,5 @@ Una volta avviato il sistema di visualizzazione, si deve compilare la form:
   * il numero del blocco, il quale verrà preso come riferimento per disegnare l'albero. In caso di fork ci sono dei blocchi abortiti, ciascun blocco abortito che è     discendente diretto di un blocco della catena principale, può essere indicato come blocco uncle da uno dei blocchi successivi della catena principale (chiamato     quindi nipote), fino ad una distanza massima di 6 blocchi dopo la fork [[7]](https://arxiv.org/pdf/1805.08832.pdf). Quindi, se l'altezza inserita è minore di 7, l'albero viene
     costruito a ritroso, altrimenti si prende una "rincorsa" di 7 blocchi e si disegna l'albero;
   * la stringa "ultimo", questa consente di prendere come riferimento il blocco più recente per la costruzione dell'albero, e quindi di fare analisi relativamente       alla porzione più recente della blockchain.
+
+I tempi di attesa sono di circa 7 secondi ogni 10 nodi.

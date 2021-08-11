@@ -2,14 +2,15 @@
 # Creato da Gianluca Mariani e Andrea Mariani il 13/07/2021 
 #
 
-# Questo codice serve per generare, a partire da un numero di blocco e da un'altezza, un albero che rappresenta una porzione della blockchain di Ethereum. 
+# Questo codice serve per generare, a partire da un numero di blocco e da un'altezza, 
+# un albero che rappresenta una porzione della blockchain di Ethereum. 
 # In particolare, si restituisce l'albero in formato JSON.
 
 # libreria utilizzata per generare un JSON a partire da un oggetto Python
 import json
 # libreria utilizzata per connettersi a un nodo della rete Ethereum e per prendere informazioni relative alla blockchain
 from web3 import Web3
-# libreria utilizzata per tirare su un web server che offre il servizio di generazione dell'albero
+# libreria utilizzata per tirare su un API server che offre il servizio di generazione dell'albero
 from flask import Flask, json, request
 from flask_cors import CORS
 
@@ -33,7 +34,7 @@ class Tree(dict):
         else:
             self.children = []
 
-# viene effettuata al connessione a un nodo della rete di Ethereum
+# viene effettuata la connessione a un nodo della rete di Ethereum
 web3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/33319769ccc74511ac1eb90012e6f04c'))
 if (web3.isConnected()):
     print("Connection successful" + "\n")
@@ -91,7 +92,7 @@ def generate_tree(block_num, height):
             generated_tree = generate_tree_aux(0, height - 1, 0, blocks_to_append, total_trans_uncles_number, links_uncle_reward, all_famous_miner)
         
     # 2 visita:
-    # si appendono tutti i blocchi uncle visitati in precedenza, al rispettivo genitore. Questo va fatto perché se 
+    # si appendono tutti i blocchi uncle trovati in precedenza, al rispettivo genitore. Questo va fatto perché se 
     # c'è stata una fork si sa dopo e quindi si sa quando un blocco ha ricompensato un blocco uncle e questo 
     # blocco uncle ha l'hash del blocco genitore al quale doveva essere attaccato
     append_blocks(generated_tree, blocks_to_append, total_trans_uncles_number)
