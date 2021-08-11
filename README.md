@@ -41,25 +41,26 @@ Per utilizzare il repository è necessario avere installato:
 * [Python] 3.x.x;
 * [package web3] 5.21.0 (pip install web3==5.21.0);
 * [package Flask] 1.1.2 (pip install Flask==1.1.2);
-* [package Flask-Cors] 3.0.10 (pip install Flask-Cors==3.0.10);
+* [package Flask-Cors] 3.0.10 (pip install Flask-Cors==3.0.10).
+
+I package possono essere installati posizionandosi nella cartella backend ed eseguendo il comando `pip install -r requirements.txt`.
 
 ## Utilizzo del repository
 
 Per l'avvio è necessario aprire due shell, ciascuna posizionata in una delle due cartelle (frontend, backend).
 
 Nel tab backend:
-* eseguire `pip install -r requirements.txt` per installare i package necessari.
 * eseguire `python3 generate_tree.py` per avviare l'API server.
 
 Nel tab frontend:
 * eseguire `python3 -m http.server 2222` per avviare il Web server.
 
-A questo punto, aprire il borwser di riferimento e digitare http://localhost:2222
+A questo punto, aprire il borwser di riferimento e digitare http://localhost:2222.
 
 ## Utilizzo del sistema di visualizzazione
 Una volta avviato il sistema di visualizzazione, si deve compilare la form:
-* nel campo "Altezza" si inserisce l'altezza dell'albero che si vuole visualizzare;
-* nel campo "Numero di blocco" si può inserire:
+* nel campo "Altezza albero" si inserisce l'altezza dell'albero che si vuole visualizzare;
+* nel campo "Numero blocco" si può inserire:
   * il numero del blocco, il quale verrà preso come riferimento per disegnare l'albero. In caso di fork ci sono dei blocchi abortiti, ciascun blocco abortito che è     discendente diretto di un blocco della catena principale, può essere indicato come blocco uncle da uno dei blocchi successivi della catena principale (chiamato     quindi nipote), fino ad una distanza massima di 6 blocchi dopo la fork [[7]](https://arxiv.org/pdf/1805.08832.pdf). Quindi, se l'altezza inserita è minore di 7, l'albero viene
     costruito a ritroso, altrimenti si prende una "rincorsa" di 7 blocchi e si disegna l'albero;
   * la stringa "ultimo", questa consente di prendere come riferimento il blocco più recente per la costruzione dell'albero, e quindi di fare analisi relativamente       alla porzione più recente della blockchain.
