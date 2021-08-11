@@ -31,7 +31,7 @@ L'obiettivo di questo progetto è stato quello di sviluppare un sistema di visua
 
 ## Implementazione
 
-Per connettersi ad un nodo della rete Ethereum è stato utilizzato il package Web3.py [[5]](https://web3py.readthedocs.io/en/stable/).
+Per interagire con un nodo della rete Ethereum è stato utilizzato il package Web3.py [[5]](https://web3py.readthedocs.io/en/stable/).
 
 Per rappresentare l'albero è stato utilizzato il layout `tree` offerto da D3.js [[6]](https://observablehq.com/@d3/tidy-tree) che implementa l'algoritmo di Reingold–Tilford. 
 
