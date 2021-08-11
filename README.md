@@ -14,8 +14,8 @@ Per effettuare il download del repository:
 ## Organizzazione del repository 
 
 Questo repository è organizzato in due sezioni (cartelle):
-* [backend](backend/): contenente un file python che implementa un API server il quale mette a disposizione il seguente end-point `GET /generate-tree?block={block}&height={height}`, quest'ultimo permette di costruire un albero di altezza specificata a partire dal numero di blocco dato;
-* [frontend](frontend/): contenente i file relativi al sistema di visualizzazione.
+* [back-end](back-end/): contenente un file python che implementa un API server il quale mette a disposizione il seguente end-point `GET /generate-tree?block={block}&height={height}`, quest'ultimo permette di costruire un albero di altezza specificata a partire dal numero di blocco dato;
+* [front-end](front-end/): contenente i file relativi al sistema di visualizzazione.
 
 ## Architettura:
 ![](architettura.png)
