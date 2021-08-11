@@ -1,5 +1,5 @@
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
 }
 
@@ -62,7 +62,7 @@ input[type=button]:hover {
   border: 1px solid rgba(0, 0, 0, 0.8);
 }
 
-.gaugePieCharts {
+.gaugePieLegendCharts {
     display: inline-block;
 }
 
