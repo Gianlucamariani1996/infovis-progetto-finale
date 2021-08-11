@@ -25,7 +25,7 @@ Questo repository è organizzato in due sezioni (cartelle):
 * [backend](backend/): contenente un file python che implementa un API server che espone un end-point `GET /generate-tree?block={block}&height={height}` costruisce un albero di altezza data a partire dal numero di blocco dato;
 * [frontend](frontend/): contenente i file per il sistema di visualizzazione;
 
-![](architettura.PNG)
+![](architettura.png)
 
 ## Obiettivi
 
